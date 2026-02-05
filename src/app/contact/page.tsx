@@ -1,0 +1,3 @@
+import { SimplePage } from "@/components/simple-page";
+
+export default function ContactPage() { return <SimplePage title="Contact Us"><form className="grid gap-3"><input placeholder="Name" className="min-h-11 rounded border px-3"/><input placeholder="Email" className="min-h-11 rounded border px-3"/><input placeholder="Subject" className="min-h-11 rounded border px-3"/><textarea placeholder="Message" className="rounded border p-3"/><button className="min-h-11 rounded bg-pharma-primary text-white">Send</button></form><p>Address, phone, email, business hours and map placeholder.</p></SimplePage>; }
