@@ -1,12 +1,15 @@
 # AI Signal Tools — MT5 Forex EA + Browser Signal Pages
 
-Three tools, one repo:
+Four tools, one repo:
 
 1. **`AI_Momentum_Trend.mq5`** — a real **MT5 Expert Advisor** (forex). Reads your
    broker's **live** market data, runs a Momentum/Trend strategy, draws BUY/SELL
    arrows, alerts, and can auto-trade.
-2. **`forex.html`** — browser/phone forex signal page (real **daily** ECB data).
-3. **`index.html`** — live crypto signal bot (Binance/OKX/Gate real-time).
+2. **`signals.html`** — unified **web signals page** with two modes:
+   **Forex for MT5** (daily ECB data) and **Crypto for Pocket Option** (real-time
+   exchange data). Shows BUY/SELL/UP/DOWN/WAIT signals for manual execution.
+3. **`forex.html`** — browser/phone forex-only signal page (real **daily** ECB data).
+4. **`index.html`** — live crypto signal bot (Binance/OKX/Gate real-time).
 
 ## 🤖 MT5 Expert Advisor (`AI_Momentum_Trend.mq5`)
 
@@ -28,11 +31,19 @@ EMA periods, RSI period & limits, MACD periods, max spread, max trades, alerts.
 
 > ⚠️ Test on a **demo account** first. No strategy is guaranteed.
 
+## 🌐 Signals Web (`signals.html`)
+One page, two markets:
+- **💹 Forex (for MT5):** real daily ECB rates, ~16 major pairs, 1D/1W timeframes,
+  BUY / SELL / WAIT signals.
+- **🪙 Crypto (for Pocket Option):** real-time Binance/OKX/Gate feed, 12 coins,
+  1m–1h timeframes, UP / DOWN / WAIT signals.
+Matches the momentum strategy (EMA + MACD + RSI) and shows a "how to trade manually"
+guide. Signals are for **manual execution** in MT5/Pocket Option.
+
 ## 💹 Browser Forex Page (`forex.html`)
-Real **daily** ECB reference rates for ~16 major pairs. Runs the same momentum
-strategy on D1 data and shows a BUY/SELL/WAIT signal + verdicts + chart. Signals
-are **daily-style**, not live intraday — use the MT5 EA for live trading.
-Deployable on GitHub Pages or Netlify (static).
+Real **daily** ECB reference rates for ~16 major pairs. Same momentum strategy on
+D1 data, BUY/SELL/WAIT + verdicts + chart. Daily-style, not live intraday — use
+the MT5 EA for live trading.
 
 ## 🪙 Live Crypto Bot (`index.html`)
 20 coins, real-time multi-exchange feed (Binance → OKX → Gate.io), full dashboard.
