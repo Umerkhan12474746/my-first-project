@@ -206,19 +206,38 @@ function makeSignal(closes){
 /* ---------- data loading ---------- */
 function norm(o,h,l,c,t){return{o:+o,h:+h,l:+l,c:+c,t:+t};}
 
-// Forex: daily ECB reference rates via Frankfurter
+// Forex: daily data. Try ECB/Frankfurter first, then open.er-api as backup.
 async function loadForex(){
   const [base,quote]=FOREX[state.pair];
-  const end=new Date(),start=new Date(end.getTime()-180*24*3600*1000);
-  const f=d=>d.toISOString().slice(0,10);
-  const url=`https://api.frankfurter.dev/v1/${f(start)}..${f(end)}?from=${base}&to=${quote}`;
-  const res=await fetch(url); if(!res.ok) throw 0;
-  const j=await res.json(); const rates=j.rates||{};
-  const keys=Object.keys(rates).sort();
-  const closes=keys.map(d=>rates[d][quote]);
-  state.candles=closes.map((c,i)=>({o:c,h:c,l:c,c:c,t:i}));
-  state.feed="ECB daily";
-  return true;
+  // Source 1: Frankfurter (ECB) - supports from/to cross pairs
+  try{
+    const end=new Date(),start=new Date(end.getTime()-180*24*3600*1000);
+    const f=d=>d.toISOString().slice(0,10);
+    const url=`https://api.frankfurter.dev/v1/${f(start)}..${f(end)}?from=${base}&to=${quote}`;
+    const res=await fetch(url);
+    if(res.ok){
+      const j=await res.json(); const rates=j.rates||{};
+      const keys=Object.keys(rates).sort();
+      if(keys.length>30){
+        const closes=keys.map(d=>rates[d][quote]);
+        state.candles=closes.map((c,i)=>({o:c,h:c,l:c,c:c,t:i}));
+        state.feed="ECB daily"; return true;
+      }
+    }
+  }catch(e){}
+  // Source 2: open.er-api - very reliable, wide currency support
+  try{
+    const url=`https://open.er-api.com/v6/latest/${base}`;
+    const res=await fetch(url); if(!res.ok) throw 0;
+    const j=await res.json(); if(j.result!=="success") throw 0;
+    const rates=j.rates; if(!rates||!rates[quote]) throw 0;
+    const val=rates[quote];
+    // No free history here — we only have the latest rate. Build a small flat
+    // baseline so the page still renders, and mark it clearly in the feed label.
+    state.candles=Array.from({length:60},(_,i)=>({o:val,h:val,l:val,c:val,t:i}));
+    state.feed="latest rate only"; return true;
+  }catch(e){}
+  return false;
 }
 
 // Crypto: real-time, multi-exchange fallback
@@ -292,12 +311,14 @@ function renderVerdicts(reasons){
 async function run(){
   $("srcPill").textContent="Loading…";$("srcPill").style.color="";
   renderCtl();
-  let ok;
+  let ok, errMsg="";
   try{ ok=state.mode==="forex"?await loadForex():await loadCrypto(); }
-  catch(e){ ok=false; }
+  catch(e){ ok=false; errMsg=(e&&e.message)?e.message:String(e); }
   if(!ok){ $("scDir").textContent="ERR";$("scDir").className="sc-big wait";
-    $("scanList").innerHTML=`<div style="color:var(--red)">Could not fetch live data (need internet). Try again.</div>`;
-    $("srcPill").textContent="ERROR"; return; }
+    $("scConf").textContent="—";
+    $("scanList").innerHTML=`<div style="color:var(--red);line-height:1.5">No live data could be fetched. Check your internet connection and try the Analyze button again.<br><span style="font-size:11px">${errMsg}</span></div>`;
+    $("srcPill").textContent="OFFLINE";
+    $("pFeed").textContent="none"; return; }
   const closes=state.candles.map(c=>c.c);
   drawChart(closes);
   const sig=makeSignal(closes);

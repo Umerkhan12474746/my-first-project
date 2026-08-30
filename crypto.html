@@ -595,6 +595,8 @@ window.addEventListener("resize",drawChart);
 renderPairs(); renderTF(); renderRisk(); renderCtl();
 drawChart(); drawGauge();
 setInterval(()=>{ if(state.running)drawChart(); },600);
+// Auto-start so signals appear immediately without pressing the button.
+setTimeout(()=>{ if(!state.running) startLoop(); }, 300);
 </script>
 </body>
 </html>
