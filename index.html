@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>AI Trade Signal — Pocket Option Signals Engine</title>
+<title>AI Live Crypto Signal Bot — Real-Time Signals</title>
 <style>
   :root{
     --bg:#070b14; --panel:#0d1424; --panel2:#111a2e; --line:#1c2942;
@@ -18,7 +18,6 @@
     overflow-x:hidden;
   }
   .wrap{max-width:1280px;margin:0 auto;padding:14px}
-  /* header */
   header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .logo{display:flex;align-items:center;gap:10px}
   .logo .bolt{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
@@ -41,7 +40,6 @@
   .panel{background:linear-gradient(180deg,var(--panel),#0b1120);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
   .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
 
-  /* pair list */
   .search{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
     padding:9px 12px;font-size:13px;margin-bottom:10px;outline:none}
   .search:focus{border-color:var(--violet)}
@@ -53,11 +51,10 @@
   .pair:hover{background:var(--panel2)}
   .pair.active{background:var(--panel2);border-color:var(--violet)}
   .pair .name{font-weight:600}
-  .pair .tag{font-size:10px;color:var(--mut);margin-left:6px}
+  .pair .tag{font-size:10px;color:var(--green);margin-left:6px}
   .pair .pct{font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px}
   .pct.up{color:var(--green)} .pct.down{color:var(--red)}
 
-  /* controls */
   .sel{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:10px}
   .sel .lb{font-size:11px;color:var(--mut)}
   .sel .val{font-weight:700;font-size:15px}
@@ -74,7 +71,6 @@
   .startbtn.running{background:linear-gradient(135deg,var(--red),#ff8a00);box-shadow:0 10px 30px rgba(234,57,67,.4)}
   .startbtn small{display:block;font-size:10px;font-weight:500;opacity:.85}
 
-  /* signal card */
   .signal-card{text-align:center;padding:6px 4px}
   .sc-big{font-size:46px;font-weight:900;letter-spacing:1px;line-height:1}
   .sc-big.up{color:var(--green);text-shadow:0 0 30px rgba(22,199,132,.5)}
@@ -85,13 +81,11 @@
   .sc-lbl{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
   .sc-pair{font-size:15px;font-weight:700;margin-top:6px}
 
-  /* countdown */
   .cd{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:12px}
   .cdbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:center;min-width:64px}
   .cdbox .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
   .cdbox .u{font-size:10px;color:var(--mut)}
 
-  /* chart */
   #chartWrap{position:relative;width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0a1020}
   canvas#chart{width:100%;display:block;height:340px}
   .chart-legend{position:absolute;top:8px;left:10px;display:flex;gap:12px;font-size:10px;color:var(--mut)}
@@ -100,14 +94,12 @@
   .price-tag{position:absolute;right:10px;top:8px;font-size:12px;font-weight:700}
   .price-tag.up{color:var(--green)} .price-tag.down{color:var(--red)}
 
-  /* scanner */
   .scanner-line{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--mut);min-height:24px;transition:.3s}
   .scanner-line.active{color:var(--txt)}
   .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--mut);border-top-color:var(--cyan);border-radius:50%;animation:rot .7s linear infinite}
   @keyframes rot{to{transform:rotate(360deg)}}
   .check{color:var(--green);font-weight:700}
 
-  /* recent signals */
   .sig-log{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
   .sig-item{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px}
   .sig-item .p{font-weight:700;min-width:86px}
@@ -117,7 +109,6 @@
   .sig-item .c{margin-left:auto;font-weight:800}
   .sig-item .t{color:var(--mut);font-variant-numeric:tabular-nums}
 
-  /* strength gauge */
   .gauge{display:flex;flex-direction:column;align-items:center;gap:6px}
   .gauge-ring{width:120px;height:120px}
   .gauge .gl{font-size:26px;font-weight:800}
@@ -125,7 +116,6 @@
   .gauge-bar{width:100%;height:8px;background:var(--panel2);border-radius:5px;overflow:hidden;margin-top:8px}
   .gauge-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:5px;transition:width .5s}
 
-  /* strategies */
   .strat{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12px;border-bottom:1px dashed var(--line)}
   .strat:last-child{border-bottom:none}
   .strat .sname{font-weight:600}
@@ -153,8 +143,8 @@
     <div class="logo">
       <div class="bolt">⚡</div>
       <div>
-        <h1>AI Trade Signal <span style="color:var(--violet)">Engine</span></h1>
-        <small>Technical-analysis signal generator · Pocket Option-style dashboard</small>
+        <h1>AI Live Crypto <span style="color:var(--violet)">Signal Bot</span></h1>
+        <small>Real-time technical analysis · Binance · OKX · Gate</small>
       </div>
     </div>
     <div class="hdr-right">
@@ -168,11 +158,10 @@
     <!-- LEFT: pairs -->
     <div class="col-left">
       <div class="panel">
-        <h3>Market Pairs <span id="pairCount" style="color:var(--mut)">0</span></h3>
-        <input class="search" id="pairSearch" placeholder="🔍 Search pair..." />
+        <h3>Live Markets <span id="pairCount" style="color:var(--mut)">0</span></h3>
+        <input class="search" id="pairSearch" placeholder="🔍 Search coin..." />
         <div class="pair-cats">
           <button class="cat active" data-f="all">All</button>
-          <button class="cat" data-f="OTC">OTC</button>
           <button class="cat" data-f="LIVE">Live</button>
         </div>
         <div class="pairs" id="pairList"></div>
@@ -195,7 +184,7 @@
           <span>Open <b id="tOpen">—</b></span>
           <span>High <b id="tHigh">—</b></span>
           <span>Low <b id="tLow">—</b></span>
-          <span>Volatility <b id="tVol">—</b></span>
+          <span>24h % <b id="tVol">—</b></span>
         </div>
       </div>
 
@@ -204,7 +193,7 @@
           <div class="sc-lbl">AI Signal</div>
           <div class="sc-big wait" id="scDir">AWAIT</div>
           <div class="conf"><span id="scConf">—</span> <small>confidence</small></div>
-          <div class="sc-pair" id="scPair">Select a pair</div>
+          <div class="sc-pair" id="scPair">Select a coin</div>
           <div class="cd">
             <div class="cdbox"><div class="n" id="cdMin">00</div><div class="u">MIN</div></div>
             <div class="cdbox"><div class="n" id="cdSec">00</div><div class="u">SEC</div></div>
@@ -223,12 +212,12 @@
     <div class="col-right">
       <div class="panel">
         <h3>Bot Controls</h3>
-        <div class="sel"><span class="lb">Selected Pair</span><span class="val" id="ctlPair">—</span></div>
+        <div class="sel"><span class="lb">Selected Coin</span><span class="val" id="ctlPair">—</span></div>
         <div class="sel"><span class="lb">Expiry / Timeframe</span><span class="val" id="ctlTF">1m</span></div>
         <div class="tf" id="tfRow"></div>
         <div class="sel" style="margin-top:8px"><span class="lb">Risk Level</span><span class="val" id="ctlRisk">Moderate</span></div>
         <div class="risk" id="riskRow"></div>
-        <button class="startbtn" id="startBtn">▶ START BOT<small>Activate signal engine</small></button>
+        <button class="startbtn" id="startBtn">▶ START BOT<small>Activate live signal engine</small></button>
       </div>
 
       <div class="panel">
@@ -249,90 +238,26 @@
   </div>
 
   <div class="disc">
-    <b>⚠️ Education only — not auto-trading.</b> This is a client-side technical-analysis signal engine running in your browser. Crypto pairs
-    (BTC, ETH, SOL, …) pull <b>real live prices</b> from Binance's free public API. FX/OTC pairs and any offline moment fall back to demo data.
-    It does <b>not</b> connect to Pocket Option, place trades, or auto-execute anything. Signals are probability-style suggestions from RSI, EMA
-    crossover, MACD, Bollinger Bands, support/resistance and candlestick patterns. <b>No signal is guaranteed</b> — options/binary trading is high
-    risk and you can lose your deposit. Trade at your own risk. Not financial advice.
+    <b>⚠️ Education only — not auto-trading.</b> This bot pulls <b>real live crypto prices</b> from free public exchange APIs
+    (Binance, OKX, Gate.io) and runs technical analysis (RSI, EMA crossover, MACD, Bollinger, support/resistance, candlestick
+    patterns) to suggest <b>UP / DOWN</b> signals. It does <b>not</b> connect to Pocket Option, place trades, or auto-execute.
+    If your device is fully offline it falls back to demo data and shows <b>DEMO</b>. <b>No signal is guaranteed</b> — crypto &
+    options trading is high risk and you can lose your deposit. Trade at your own risk. Not financial advice.
   </div>
 
-  <footer>AI Trade Signal Engine · runs 100% in your browser · deployed on Netlify</footer>
+  <footer>AI Live Crypto Signal Bot · real-time feed · runs in your browser</footer>
 </div>
 
 <script>
 /* =========================================================
-   AI SIGNAL ENGINE — real technical analysis, simulated data
+   AI LIVE CRYPTO SIGNAL BOT — real market data, real analysis
    ========================================================= */
 
-/* ---------------- PAIRS ---------------- */
-const PAIRS = [
-  // OTC
-  ["AED/CNY","OTC","UP",90],["AUD/CAD","OTC","DOWN",88],["AUD/CHF","OTC","UP",93],
-  ["AUD/USD","OTC","DOWN",91],["CHF/NOK","OTC","UP",95],["EUR/CHF","OTC","DOWN",92],
-  ["EUR/GBP","OTC","UP",90],["EUR/RUB","OTC","DOWN",96],["EUR/USD","OTC","UP",93],
-  ["GBP/AUD","OTC","DOWN",91],["GBP/USD","OTC","UP",88],["MAD/USD","OTC","DOWN",94],
-  ["NZD/USD","OTC","UP",92],["QAR/CNY","OTC","DOWN",90],["SAR/CNY","OTC","UP",95],
-  ["TND/USD","OTC","DOWN",92],["USD/BRL","OTC","UP",90],["USD/CAD","OTC","DOWN",96],
-  ["USD/CLP","OTC","UP",93],["USD/IDR","OTC","DOWN",91],["USD/INR","OTC","UP",89],
-  ["USD/JPY","OTC","DOWN",94],["USD/MYR","OTC","UP",92],["USD/PKR","OTC","DOWN",90],
-  ["USD/RUB","OTC","UP",95],["USD/THB","OTC","DOWN",93],["ZAR/USD","OTC","UP",90],
-  ["EUR/TRY","OTC","DOWN",96],["USD/CHF","OTC","UP",92],["AUD/JPY","OTC","DOWN",91],
-  ["USD/PHP","OTC","UP",89],["EUR/NZD","OTC","DOWN",94],["CAD/CHF","OTC","UP",92],
-  ["NGN/USD","OTC","DOWN",90],["JOD/CNY","OTC","UP",95],["USD/ARS","OTC","DOWN",92],
-  ["USD/BDT","OTC","UP",90],["USD/MXN","OTC","DOWN",96],["EUR/JPY","OTC","UP",93],
-  ["YER/USD","OTC","DOWN",91],["BHD/CNY","OTC","UP",89],["CAD/JPY","OTC","DOWN",94],
-  ["EUR/HUF","OTC","UP",92],["USD/CNH","OTC","DOWN",90],["KES/USD","OTC","UP",95],
-  ["CHF/JPY","OTC","DOWN",93],["GBP/JPY","OTC","UP",91],["USD/EGP","OTC","DOWN",96],
-  ["UAH/USD","OTC","UP",92],["AUD/NZD","OTC","DOWN",90],["LBP/USD","OTC","UP",94],
-  ["USD/COP","OTC","DOWN",91],["USD/DZD","OTC","UP",95],["USD/VND","OTC","DOWN",92],
-  ["OMR/CNY","OTC","UP",96],["USD/SGD","OTC","DOWN",90],
-  // LIVE crypto (real Binance feed)
-  ["BTC/USD","LIVE","UP",91],["ETH/USD","LIVE","DOWN",93],["SOL/USD","LIVE","UP",90],
-  ["BNB/USD","LIVE","DOWN",89],["ADA/USD","LIVE","UP",88],["DOGE/USD","LIVE","DOWN",90],
-  ["LTC/USD","LIVE","UP",89],["XRP/USD","LIVE","DOWN",91],["LINK/USD","LIVE","UP",90],
-  ["AVAX/USD","LIVE","DOWN",88],["MATIC/USD","LIVE","UP",89],["DOT/USD","LIVE","DOWN",90],
-  // LIVE FX & metals (demo data)
-  ["XAU/USD","LIVE","UP",91],["EUR/USD","LIVE","DOWN",92],["GBP/USD","LIVE","UP",89],
-  ["USD/JPY","LIVE","DOWN",91],["USD/CNH","LIVE","UP",90],["AUD/NZD","LIVE","DOWN",89],
-  ["USD/INR","LIVE","UP",92],["USD/BDT","LIVE","DOWN",88],["USD/SGD","LIVE","UP",90],
-  ["USD/COP","LIVE","DOWN",91],["CAD/CHF","LIVE","UP",92],["EUR/JPY","LIVE","DOWN",90]
-];
-
-/* ---------------- LIVE CRYPTO FEED (Binance) ---------------- */
-// Pairs that use a REAL live price feed from Binance's free public API.
-const LIVE_SYMBOLS = {
-  "BTC/USD":"BTCUSDT","ETH/USD":"ETHUSDT","SOL/USD":"SOLUSDT","BNB/USD":"BNBUSDT",
-  "ADA/USD":"ADAUSDT","DOGE/USD":"DOGEUSDT","LTC/USD":"LTCUSDT","XRP/USD":"XRPUSDT",
-  "LINK/USD":"LINKUSDT","AVAX/USD":"AVAXUSDT","MATIC/USD":"MATICUSDT","DOT/USD":"DOTUSDT"
-};
-function isLivePair(){ return !!LIVE_SYMBOLS[state.pair[0]]; }
-// Fetch real 1m candles. Tries several free, CORS-enabled public endpoints in order
-// so the feed keeps working even if one provider is geo-blocked or down.
-const LIVE_ENDPOINTS = [
-  sym=>`https://data-api.binance.vision/api/v3/klines?symbol=${sym}&interval=1m&limit=150`,
-  sym=>`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1m&limit=150`,
-  sym=>`https://fapi.binance.com/fapi/v1/klines?symbol=${sym}&interval=1m&limit=150`
-];
-async function loadLive(){
-  const sym=LIVE_SYMBOLS[state.pair[0]];
-  for(const build of LIVE_ENDPOINTS){
-    try{
-      const res=await fetch(build(sym));
-      if(!res.ok) continue;
-      const raw=await res.json();
-      if(!raw || !raw.length) continue;
-      state.candles=raw.map(k=>({o:+k[1],h:+k[2],l:+k[3],c:+k[4],t:+k[0],v:+k[5]}));
-      state.lastClose=state.candles[state.candles.length-1].c;
-      state.vol=0.002;
-      $("srcPill").textContent="LIVE";
-      $("srcPill").style.color="#16c784";
-      return true;
-    }catch(e){ /* try next source */ }
-  }
-  $("srcPill").textContent="DEMO";
-  $("srcPill").style.color="";
-  return false;
-}
+/* ---------------- LIVE PAIRS (real data) ---------------- */
+const CRYPTO = ["BTC","ETH","SOL","BNB","ADA","DOGE","LTC","XRP","LINK","AVAX",
+                "MATIC","DOT","TRX","TON","SHIB","UNI","ATOM","NEAR","AAVE","ARB"];
+// each: [display, BinanceSymbol, OKX-instId, GatePair]
+const PAIRS = CRYPTO.map(b=>[b+"/USD", b+"USDT", b+"-USDT", b+"_USDT"]);
 
 /* ---------------- TIME FRAMES ---------------- */
 const TFS = ["3s","5s","15s","30s","1m","2m","3m","4m","5m","10m","15m"];
@@ -342,63 +267,64 @@ const TF_MS = { "3s":3000,"5s":5000,"15s":15000,"30s":30000,"1m":60000,"2m":1200
 /* ---------------- STATE ---------------- */
 const state = {
   running:false,
-  pair: PAIRS[0],
+  pairIdx:0,
   filter:"all",
   tf:"1m",
   risk:"Moderate",
   candles:[],
-  hist:[],
-  lastClose:100,
+  lastClose:0,
+  change:{},
+  feedName:"",
+  live:false,
   momentum:0,
   vol:0.002,
   regime:"range",
   timer:null,
   lastSignalTf:0,
-  scannerIdx:0,
-  dataSource:"DEMO"
+  scannerIdx:0
 };
 
-/* ---------------- INDICATORS ---------------- */
-function ema(arr,p){
-  const k=2/(p+1);const out=[];let prev=arr[0];
-  for(let i=0;i<arr.length;i++){prev= i===0?arr[0] : arr[i]*k+prev*(1-k);out.push(prev);}
-  return out;
-}
-function rsi(closes,p=14){
-  let g=0,l=0;const out=[null];
-  for(let i=1;i<closes.length;i++){
-    const d=closes[i]-closes[i-1];
-    if(i<=p){ g+=d>0?d:0; l+=d<0?-d:0;
-      if(i===p){ g/=p;l/=p; out.push(100-100/(1+(l===0?1e-9:g/l))); } continue; }
-    g=(g*(p-1)+(d>0?d:0))/p; l=(l*(p-1)+(d<0?-d:0))/p;
-    out.push(100-100/(1+(l===0?1e-9:g/l)));
+/* ---------------- LIVE DATA LOADER (multi-exchange) ---------------- */
+function norm(o,h,l,c,t){ return {o:+o,h:+h,l:+l,c:+c,t:+t}; }
+// Each provider: build URL from pair entry, parse raw JSON into candles (oldest-first).
+const PROVIDERS = [
+  { name:"Binance", build:s=>`https://data-api.binance.vision/api/v3/klines?symbol=${s[1]}&interval=1m&limit=150`,
+    parse:raw=>raw.map(k=>norm(k[1],k[2],k[3],k[4],k[0])) },
+  { name:"OKX", build:s=>`https://www.okx.com/api/v5/market/candles?instId=${s[2]}&bar=1m&limit=150`,
+    parse:raw=>raw.data.map(k=>norm(k[1],k[2],k[3],k[4],k[0])) },
+  { name:"Gate", build:s=>`https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${s[3]}&interval=1m&limit=150`,
+    parse:raw=>raw.map(k=>norm(k[5],k[3],k[4],k[2],k[0]*1000)) }
+];
+async function loadLive(){
+  const sym=PAIRS[state.pairIdx];
+  for(const p of PROVIDERS){
+    try{
+      const res=await fetch(p.build(sym));
+      if(!res.ok) continue;
+      const raw=await res.json();
+      let arr; try{ arr=p.parse(raw); }catch(e){ continue; }
+      if(!arr || arr.length<30) continue;
+      arr.sort((a,b)=>a.t-b.t); // oldest-first regardless of provider order
+      state.candles=arr;
+      state.lastClose=arr[arr.length-1].c;
+      state.feedName=p.name;
+      state.live=true;
+      state.change[sym[0]] = arr.length>1 ? (arr[arr.length-1].c-arr[0].c)/arr[0].c*100 : 0;
+      return true;
+    }catch(e){ /* try next exchange */ }
   }
-  return out;
-}
-function sma(arr,p){const out=[];for(let i=0;i<arr.length;i++){if(i<p-1){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=arr[j];out.push(s/p);}return out;}
-function std(arr,p){const out=[];const m=sma(arr,p);for(let i=0;i<arr.length;i++){if(m[i]==null){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=(arr[j]-m[i])**2;out.push(Math.sqrt(s/p));}return out;}
-function macd(closes,fast=12,slow=26,sig=9){
-  const ef=ema(closes,fast), es=ema(closes,slow);
-  const macdLine=closes.map((_,i)=>ef[i]-es[i]);
-  const signal=ema(macdLine,sig);
-  const hist=macdLine.map((v,i)=>v-signal[i]);
-  return {macdLine,signal,hist};
+  state.live=false;
+  state.feedName="offline";
+  return false;
 }
 
-/* ---------------- CANDLE GENERATOR ---------------- */
+/* ---------------- DEMO FALLBACK (only when device is fully offline) ---------------- */
 function genCandle(){
-  // regime shifts create trends so crossovers/RSI actually happen
-  if(Math.random()<0.06){
-    const r=Math.random();
-    state.regime = r<0.35?"up":r<0.7?"down":"range";
-  }
-  let drift=0;
-  if(state.regime==="up") drift=0.0009; else if(state.regime==="down") drift=-0.0009;
-  // momentum persistence
-  state.momentum = state.momentum*0.7 + (Math.random()-0.5)*0.0016 + drift*0.5;
-  state.vol = Math.max(0.0006, state.vol*0.9 + Math.abs(Math.random()-0.5)*0.0006);
-
-  const o=state.lastClose;
+  if(Math.random()<0.06){ const r=Math.random(); state.regime=r<0.35?"up":r<0.7?"down":"range"; }
+  let drift=0; if(state.regime==="up")drift=0.0009; else if(state.regime==="down")drift=-0.0009;
+  state.momentum=state.momentum*0.7+(Math.random()-0.5)*0.0016+drift*0.5;
+  state.vol=Math.max(0.0006,state.vol*0.9+Math.abs(Math.random()-0.5)*0.0006);
+  const o=state.lastClose||100;
   const c=Math.max(1,o*(1+state.momentum+(Math.random()-0.5)*state.vol));
   const hi=Math.max(o,c)*(1+Math.random()*state.vol*0.6);
   const lo=Math.min(o,c)*(1-Math.random()*state.vol*0.6);
@@ -406,152 +332,132 @@ function genCandle(){
   return {o,h:hi,l:lo,c,t:Date.now(),v:Math.random()*400+100};
 }
 
+/* ---------------- INDICATORS ---------------- */
+function ema(arr,p){ const k=2/(p+1);const out=[];let prev=arr[0];
+  for(let i=0;i<arr.length;i++){prev= i===0?arr[0]:arr[i]*k+prev*(1-k);out.push(prev);} return out; }
+function rsi(closes,p=14){ let g=0,l=0;const out=[null];
+  for(let i=1;i<closes.length;i++){ const d=closes[i]-closes[i-1];
+    if(i<=p){ g+=d>0?d:0;l+=d<0?-d:0; if(i===p){g/=p;l/=p;out.push(100-100/(1+(l===0?1e-9:g/l)));} continue; }
+    g=(g*(p-1)+(d>0?d:0))/p; l=(l*(p-1)+(d<0?-d:0))/p; out.push(100-100/(1+(l===0?1e-9:g/l))); }
+  return out; }
+function sma(arr,p){ const out=[];for(let i=0;i<arr.length;i++){ if(i<p-1){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=arr[j];out.push(s/p);}return out; }
+function std(arr,p){ const out=[];const m=sma(arr,p);for(let i=0;i<arr.length;i++){ if(m[i]==null){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=(arr[j]-m[i])**2;out.push(Math.sqrt(s/p));}return out; }
+function macd(closes,fast=12,slow=26,sig=9){ const ef=ema(closes,fast),es=ema(closes,slow);
+  const ml=closes.map((_,i)=>ef[i]-es[i]); const signal=ema(ml,sig); const hist=ml.map((v,i)=>v-signal[i]); return {hist}; }
+
 /* ---------------- SIGNAL ANALYSIS ---------------- */
 function analyze(candles){
-  const closes=candles.map(x=>x.c);
-  const highs=candles.map(x=>x.h);
-  const lows=candles.map(x=>x.l);
-  const R=rsi(closes,14);
-  const e9=ema(closes,9), e21=ema(closes,21);
+  const closes=candles.map(x=>x.c), highs=candles.map(x=>x.h), lows=candles.map(x=>x.l);
+  const R=rsi(closes,14), e9=ema(closes,9), e21=ema(closes,21);
   const bbM=sma(closes,20), bbS=std(closes,20);
   const bbU=bbM.map((m,i)=>m==null?null:m+2*bbS[i]);
   const bbL=bbM.map((m,i)=>m==null?null:m-2*bbS[i]);
   const {hist:mhist}=macd(closes);
-  const n=candles.length;
-  const last=candles[n-1], prev=candles[n-2];
-  const r=R[n-1];
+  const n=candles.length, last=candles[n-1], prev=candles[n-2], r=R[n-1];
   let score=0, reasons=[];
 
-  // 1. EMA trend & crossover
-  const emaUp = e9[n-1]>e21[n-1];
-  const cross = (e9[n-1]-e21[n-1]) * (e9[n-2]-e21[n-2]) < 0;
-  if(emaUp){score+=0.22; if(cross){score+=0.18; reasons.push(["EMA Crossover","CONFIRMED","ok"]);}
-    else reasons.push(["EMA Trend","BULLISH","ok"]);}
-  else {score-=0.22; if(cross){score-=0.18; reasons.push(["EMA Crossover","BEARISH","ok"]);}
-    else reasons.push(["EMA Trend","BEARISH","ok"]);}
+  const emaUp=e9[n-1]>e21[n-1];
+  const cross=(e9[n-1]-e21[n-1])*(e9[n-2]-e21[n-2])<0;
+  if(emaUp){ score+=0.22; if(cross){score+=0.18;reasons.push(["EMA Crossover","CONFIRMED","ok"]);}else reasons.push(["EMA Trend","BULLISH","ok"]); }
+  else { score-=0.22; if(cross){score-=0.18;reasons.push(["EMA Crossover","BEARISH","ok"]);}else reasons.push(["EMA Trend","BEARISH","ok"]); }
 
-  // 2. RSI — momentum + divergence/overextension
-  if(r<70 && r>30){ if(r>55)score-=0.12; else if(r<45)score+=0.12; }
+  if(r<70&&r>30){ if(r>55)score-=0.12; else if(r<45)score+=0.12; }
   if(r>72)score-=0.15; else if(r<28)score+=0.15;
-  const rv = r<30?["OVERSOLD","ok"]:(r>70?["OVERBOUGHT","ok"]:["NEUTRAL","mid"]);
-  reasons.push(["RSI (14)", rv[0], rv[1]]);
+  reasons.push(["RSI (14)", r<30?"OVERSOLD":r>70?"OVERBOUGHT":"NEUTRAL", r<30||r>70?"ok":"mid"]);
 
-  // 3. MACD histogram
-  const h0=mhist[n-1], h1=mhist[n-2];
-  if(h0>0)score+=0.15; else score-=0.15;
+  const h0=mhist[n-1]; if(h0>0)score+=0.15; else score-=0.15;
   reasons.push(["MACD", h0>0?"BULLISH":"BEARISH","ok"]);
 
-  // 4. Bollinger breakout
   if(bbU[n-1]!=null){
-    if(last.c>bbU[n-1]){score+=0.18; reasons.push(["Bollinger Breakout","UPPER","ok"]);}
-    else if(last.c<bbL[n-1]){score-=0.18; reasons.push(["Bollinger Breakout","LOWER","ok"]);}
-    else reasons.push(["Bollinger Bands","IN RANGE","mid"]);
+    if(last.c>bbU[n-1]){score+=0.18;reasons.push(["Bollinger","UPPER BREAK","ok"]);}
+    else if(last.c<bbL[n-1]){score-=0.18;reasons.push(["Bollinger","LOWER BREAK","ok"]);}
+    else reasons.push(["Bollinger","IN RANGE","mid"]);
   }
 
-  // 5. Support / Resistance (recent swing)
-  const look=Math.min(20,n-1);
-  let hi=0,lo=1e9,hiAt=0,loAt=0;
+  const look=Math.min(20,n-1); let hi=0,lo=1e9,hiAt=0,loAt=0;
   for(let i=n-look;i<n;i++){ if(highs[i]>hi){hi=highs[i];hiAt=i;} if(lows[i]<lo){lo=lows[i];loAt=i;} }
-  if(hiAt<loAt) { score+=0.14; reasons.push(["Support / Resistance","SUPPORT HOLD","ok"]); }
-  else if(loAt<hiAt){ score-=0.14; reasons.push(["Support / Resistance","RESISTANCE HOLD","ok"]); }
+  if(hiAt<loAt){score+=0.14;reasons.push(["Support/Resistance","SUPPORT HOLD","ok"]);}
+  else if(loAt<hiAt){score-=0.14;reasons.push(["Support/Resistance","RESISTANCE","ok"]);}
 
-  // 6. Candlestick pattern
-  const body=last.c-last.o, rng=last.h-last.l||1e-9;
-  let pat=null;
-  if(body>0 && prev.c<prev.o && last.c>prev.o && last.o<prev.c) pat=["Bullish Engulfing","ok"];
-  else if(body<0 && prev.c>prev.o && last.c<prev.o && last.o>prev.c) pat=["Bearish Engulfing","ok"];
-  else if(rng>0 && Math.abs(body)/rng<0.1 && Math.abs(last.c-last.o)<0.0015) pat=["Doji","mid"];
-  else if(Math.abs(body)/rng>0.7){ pat=body>0?["Strong Bull Candle","ok"]:["Strong Bear Candle","ok"]; }
+  const body=last.c-last.o, rng=last.h-last.l||1e-9; let pat;
+  if(body>0&&prev.c<prev.o&&last.c>prev.o&&last.o<prev.c) pat=["Bullish Engulfing","ok"];
+  else if(body<0&&prev.c>prev.o&&last.c<prev.o&&last.o>prev.c) pat=["Bearish Engulfing","ok"];
+  else if(Math.abs(body)/rng>0.7) pat=body>0?["Strong Bull Candle","ok"]:["Strong Bear Candle","ok"];
   else pat=["Neutral Body","mid"];
   if(pat[0]==="Bullish Engulfing")score+=0.18;
   if(pat[0]==="Bearish Engulfing")score-=0.18;
   reasons.push(["Candlestick",pat[0],pat[1]]);
 
-  // clamp
   score=Math.max(-1,Math.min(1,score));
-  return {score,reasons,r,emaUp,last};
+  return {score,reasons,r,last};
 }
 
 function makeSignal(){
   if(state.candles.length<30) return {dir:"wait",conf:0,reasons:[]};
   const a=analyze(state.candles);
   const abs=Math.abs(a.score);
-  if(abs<0.22) return {dir:"wait",conf:Math.round(50+abs*20),reasons:a.reasons,r:a.r};
-
-  const base=52+abs*42; // ~52-94%
-  let conf=base;
+  if(abs<0.22) return {dir:"wait",conf:Math.round(50+abs*20),reasons:a.reasons};
+  let conf=52+abs*42;
   if(state.risk==="High") conf=Math.min(94,conf+2);
   else if(state.risk==="Low") conf=Math.max(52,conf-3);
-  conf=Math.min(94,Math.max(52,conf+ (Math.random()-0.5)*3));
-  const dir=a.score>0?"UP":"DOWN";
-  return {dir,conf:Math.round(conf),reasons:a.reasons,r:a.r};
+  conf=Math.min(94,Math.max(52,conf+(Math.random()-0.5)*3));
+  return {dir:a.score>0?"UP":"DOWN",conf:Math.round(conf),reasons:a.reasons};
 }
 
 /* ---------------- RENDER HELPERS ---------------- */
 const $=id=>document.getElementById(id);
+const cur=()=>PAIRS[state.pairIdx];
 
 function renderPairs(){
   const list=$("pairList");
-  const f=state.filter;
   const q=($("pairSearch").value||"").toUpperCase();
-  const arr=PAIRS.filter(p=>(f==="all"||p[1]===f)&&p[0].includes(q));
+  const arr=PAIRS.filter(p=>p[0].includes(q));
   $("pairCount").textContent=arr.length;
-  list.innerHTML=arr.map(p=>{
-    const act=p[0]===state.pair[0]&&p[1]===state.pair[1]?"active":"";
-    const dirCls=p[2]==="UP"?"up":"down";
-    const arrow=p[2]==="UP"?"▲":"▼";
-    return `<div class="pair ${act}" data-name="${p[0]}" data-market="${p[1]}">
-      <span><span class="name">${p[0]}</span><span class="tag">(${p[1]})</span></span>
-      <span class="pct ${dirCls}">${arrow} ${p[3]}%</span></div>`;
+  list.innerHTML=arr.map((p,i)=>{
+    const gi=PAIRS.indexOf(p);
+    const act=gi===state.pairIdx?"active":"";
+    const ch=state.change[p[0]];
+    let pct="—",cls="",arrow="";
+    if(ch!=null){ pct=(ch>=0?"+":"")+ch.toFixed(2)+"%"; cls=ch>=0?"up":"down"; arrow=ch>0?"▲":ch<0?"▼":""; }
+    return `<div class="pair ${act}" data-idx="${gi}">
+      <span><span class="name">${p[0]}</span><span class="tag">LIVE</span></span>
+      <span class="pct ${cls}">${arrow} ${pct}</span></div>`;
   }).join("");
 }
 function renderTF(){ $("tfRow").innerHTML=TFS.map(t=>`<button class="${t===state.tf?'active':''}" data-tf="${t}">${t}</button>`).join(""); }
 function renderRisk(){ $("riskRow").innerHTML=["Low","Moderate","High"].map(r=>`<button class="${r===state.risk?'active':''}" data-risk="${r}">${r}</button>`).join(""); }
-function renderCtl(){ $("ctlPair").textContent=`${state.pair[0]} (${state.pair[1]})`; $("ctlTF").textContent=state.tf; $("ctlRisk").textContent=state.risk; }
+function renderCtl(){ $("ctlPair").textContent=cur()[0]; $("ctlTF").textContent=state.tf; $("ctlRisk").textContent=state.risk; }
 
 /* ---------------- CHART ---------------- */
-const canvas=$("chart"),ctx=canvas.getContext("2d");
-function sizeCanvas(){const w=canvas.clientWidth||600,h=340;canvas.width=w;canvas.height=h;}
+const canvas=$("chart"), ctx=canvas.getContext("2d");
+function sizeCanvas(){ const w=canvas.clientWidth||600,h=340; canvas.width=w; canvas.height=h; }
 function drawChart(){
   sizeCanvas();
-  const c=state.candles;const w=canvas.width,h=canvas.height;
+  const c=state.candles, w=canvas.width, h=canvas.height;
   ctx.clearRect(0,0,w,h);
-  if(c.length<2){ctx.fillStyle="#3a4a66";ctx.font="13px sans-serif";ctx.textAlign="center";ctx.fillText("Waiting for data…",w/2,h/2);return;}
-  const closes=c.map(x=>x.c);
-  const e9=ema(closes,9),e21=ema(closes,21);
+  if(c.length<2){ ctx.fillStyle="#3a4a66";ctx.font="13px sans-serif";ctx.textAlign="center";ctx.fillText("Waiting for live data…",w/2,h/2); return; }
+  const closes=c.map(x=>x.c), e9=ema(closes,9), e21=ema(closes,21);
   const bbM=sma(closes,20),bbS=std(closes,20);
+  const bbU=bbM.map((m,i)=>m==null?null:m+2*bbS[i]);
+  const bbL=bbM.map((m,i)=>m==null?null:m-2*bbS[i]);
   const n=Math.min(c.length,80), start=c.length-n;
-  let min=1e9,max=0;
-  for(let i=start;i<c.length;i++){min=Math.min(min,c[i].l);max=Math.max(max,c[i].h);}
-  min-=(max-min)*0.05;max+=(max-min)*0.05;
-  const X=i=> (i-start+0.5)/n*w;
-  const Y=v=> h-((v-min)/(max-min))*h;
-  // grid
-  ctx.strokeStyle="#12203a";ctx.fillStyle="#3a4a66";ctx.lineWidth=1;
-  ctx.font="10px sans-serif";
-  for(let g=0;g<5;g++){const yy=Y(min+(max-min)*g/4);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();
-    ctx.textAlign="left";ctx.fillText((min+(max-min)*g/4).toFixed(4),4,yy-3);}
-  // bollinger fill
-  ctx.beginPath();
-  for(let i=start;i<c.length;i++){const x=X(i);if(bbU[i]!=null){if(i===start)ctx.moveTo(x,Y(bbU[i]));else ctx.lineTo(x,Y(bbU[i]));}}
-  ctx.strokeStyle="rgba(34,211,238,.35)";ctx.stroke();
-  ctx.beginPath();
-  for(let i=start;i<c.length;i++){const x=X(i);if(bbL[i]!=null){if(i===start)ctx.moveTo(x,Y(bbL[i]));else ctx.lineTo(x,Y(bbL[i]));}}
-  ctx.strokeStyle="rgba(34,211,238,.35)";ctx.stroke();
-  // candles
+  let min=1e9,max=0; for(let i=start;i<c.length;i++){min=Math.min(min,c[i].l);max=Math.max(max,c[i].h);}
+  min-=(max-min)*0.05; max+=(max-min)*0.05;
+  const X=i=>(i-start+0.5)/n*w, Y=v=>h-((v-min)/(max-min))*h;
+  ctx.strokeStyle="#12203a";ctx.fillStyle="#3a4a66";ctx.lineWidth=1;ctx.font="10px sans-serif";
+  for(let g=0;g<5;g++){ const yy=Y(min+(max-min)*g/4);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();ctx.textAlign="left";ctx.fillText((min+(max-min)*g/4).toFixed(4),4,yy-3); }
+  function band(arr){ctx.beginPath();let st=false;for(let i=start;i<c.length;i++){if(arr[i]==null)continue;const x=X(i),y=Y(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();}
+  ctx.strokeStyle="rgba(34,211,238,.35)";band(bbU);band(bbL);
   const bw=Math.max(2,w/n*0.55);
-  for(let i=start;i<c.length;i++){
-    const x=X(i),k=c[i];const up=k.c>=k.o;
+  for(let i=start;i<c.length;i++){ const x=X(i),k=c[i],up=k.c>=k.o;
     ctx.strokeStyle=up?"#16c784":"#ea3943";ctx.fillStyle=up?"#16c784":"#ea3943";
     ctx.beginPath();ctx.moveTo(x,Y(k.h));ctx.lineTo(x,Y(k.l));ctx.lineWidth=1.3;ctx.stroke();
     const y0=Y(Math.max(k.o,k.c)),y1=Y(Math.min(k.o,k.c));
-    if(y1-y0<1){ctx.fillRect(x-bw/2,y0, bw, 1);}else ctx.fillRect(x-bw/2,y0,bw,Math.max(1,y1-y0));
+    if(y1-y0<1)ctx.fillRect(x-bw/2,y0,bw,1); else ctx.fillRect(x-bw/2,y0,bw,Math.max(1,y1-y0));
   }
-  // ema lines
   function line(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.beginPath();let st=false;
     for(let i=start;i<c.length;i++){if(arr[i]==null)continue;const x=X(i),y=Y(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();}
-  line(e9,"#16c784");line(e21,"#f5b83d");
-  // last price line
+  line(e9,"#16c784"); line(e21,"#f5b83d");
   const lp=c[c.length-1].c;
   ctx.strokeStyle="rgba(234,239,255,.5)";ctx.setLineDash([4,4]);ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(0,Y(lp));ctx.lineTo(w,Y(lp));ctx.stroke();ctx.setLineDash([]);
@@ -559,123 +465,99 @@ function drawChart(){
 function drawGauge(){
   const g=$("gauge"),gc=g.getContext("2d");
   const val=Math.min(100,Math.max(0,state.strength||0));
-  const cx=60,cy=60,r=48;
-  gc.clearRect(0,0,120,120);
-  gc.lineWidth=10;gc.lineCap="round";
-  gc.strokeStyle="#1c2942";gc.beginPath();gc.arc(cx,cy,r,Math.PI,2*Math.PI);gc.stroke();
+  gc.clearRect(0,0,120,120); gc.lineWidth=10; gc.lineCap="round";
+  gc.strokeStyle="#1c2942";gc.beginPath();gc.arc(60,60,48,Math.PI,2*Math.PI);gc.stroke();
   const col=val>66?"#16c784":val>40?"#f5b83d":"#ea3943";
-  gc.strokeStyle=col;gc.beginPath();gc.arc(cx,cy,r,Math.PI,Math.PI+val/100*Math.PI);gc.stroke();
+  gc.strokeStyle=col;gc.beginPath();gc.arc(60,60,48,Math.PI,Math.PI+val/100*Math.PI);gc.stroke();
   $("gaugeFill").style.width=val+"%";
   $("gaugeVal").textContent=Math.round(val)+"%";
   $("gaugeLbl").textContent=val>66?"STRONG":val>40?"MODERATE":"WEAK";
 }
 
 /* ---------------- SCANNER ---------------- */
-const SCAN=["Scanning RSI (14)","Analyzing Candlestick Patterns","Checking EMA Crossover",
+const SCAN=["Scanning live RSI (14)","Analyzing Candlestick Patterns","Checking EMA Crossover",
   "Monitoring Support & Resistance","Validating Trend Strength","Calculating Volatility Index","Finalizing AI Decision"];
-function tickScanner(){
-  if(!state.running)return;
-  const root=$("scanRoot");
-  root.innerHTML=`<span class="spin"></span><span>${SCAN[state.scannerIdx]}…</span>`;
-  root.classList.add("active");
-  state.scannerIdx=(state.scannerIdx+1)%SCAN.length;
-}
+function tickScanner(){ if(!state.running)return;
+  const root=$("scanRoot"); root.innerHTML=`<span class="spin"></span><span>${SCAN[state.scannerIdx]}…</span>`; root.classList.add("active");
+  state.scannerIdx=(state.scannerIdx+1)%SCAN.length; }
 
-/* ---------------- SIGNAL OUTPUT ---------------- */
-function renderVerdicts(reasons){
-  const el=$("scanList");
-  el.innerHTML=reasons.map(r=>{
-    const cls=r[2]==="ok"?"ok":r[2]==="mid"?"mid":"no";
-    return `<div class="strat"><span class="sname">📈 ${r[0]}</span><span class="sval ${cls}">${r[1]}</span></div>`;
-  }).join("");
-}
-function pushSignal(sig){
-  const dir=sig.dir;const t=new Date();
-  const ts=t.toLocaleTimeString("en-GB",{hour12:false});
-  const log=$("sigLog");
-  const empty=log.children.length===1&&log.children[0].textContent.includes("No signals");
-  if(empty)log.innerHTML="";
-  const dirCls=dir==="UP"?"up":"down";
+function renderVerdicts(reasons){ const el=$("scanList");
+  el.innerHTML=reasons.map(r=>{ const cls=r[2]==="ok"?"ok":r[2]==="mid"?"mid":"no";
+    return `<div class="strat"><span class="sname">📈 ${r[0]}</span><span class="sval ${cls}">${r[1]}</span></div>`; }).join(""); }
+
+function pushSignal(sig){ const ts=new Date().toLocaleTimeString("en-GB",{hour12:false}); const log=$("sigLog");
+  const empty=log.children.length===1&&log.children[0].textContent.includes("No signals"); if(empty)log.innerHTML="";
+  const cls=sig.dir==="UP"?"up":"down";
   log.insertAdjacentHTML("afterbegin",`<div class="sig-item">
-    <span class="p">${state.pair[0]}</span>
-    <span class="dir ${dirCls}">${dir}</span>
+    <span class="p">${cur()[0]}</span><span class="dir ${cls}">${sig.dir}</span>
     <span class="tag" style="font-size:10px;color:var(--mut)">${state.tf}</span>
-    <span class="c" style="color:${dir==='UP'?'var(--green)':'var(--red)'}">${sig.conf}%</span>
+    <span class="c" style="color:${sig.dir==='UP'?'var(--green)':'var(--red)'}">${sig.conf}%</span>
     <span class="t">${ts}</span></div>`);
-  if(log.children.length>30)log.lastChild.remove();
-}
+  if(log.children.length>30)log.lastChild.remove(); }
 
 /* ---------------- ENGINE CORE ---------------- */
 function tickEngine(){
   if(!state.running)return;
   const sig=makeSignal();
   state.strength=sig.dir==="wait"?Math.round(20+Math.abs(sig.conf-50)):sig.conf;
-  const c=sig.last||state.candles[state.candles.length-1];
-  $("priceTag").textContent=(c?c.c:state.lastClose).toFixed(5);
+  const c=state.candles[state.candles.length-1];
+  $("priceTag").textContent=c?c.c.toFixed(2):"—";
   $("priceTag").className="price-tag "+(sig.dir==="UP"?"up":sig.dir==="DOWN"?"down":"");
-  $("tOpen").textContent=c?c.o.toFixed(5):"—";
-  $("tHigh").textContent=c?c.h.toFixed(5):"—";
-  $("tLow").textContent=c?c.l.toFixed(5):"—";
-  $("tVol").textContent=(state.vol*10000).toFixed(0)+" pip";
+  $("tOpen").textContent=c?c.o.toFixed(2):"—";
+  $("tHigh").textContent=c?c.h.toFixed(2):"—";
+  $("tLow").textContent=c?c.l.toFixed(2):"—";
+  const ch=state.change[cur()[0]];
+  $("tVol").textContent=ch!=null?(ch>=0?"+":"")+ch.toFixed(2)+"%":"—";
 
   const sd=$("scDir"),sc=$("scConf");
   if(sig.dir==="UP"){sd.textContent="UP";sd.className="sc-big up";}
   else if(sig.dir==="DOWN"){sd.textContent="DOWN";sd.className="sc-big down";}
   else {sd.textContent="AWAIT";sd.className="sc-big wait";}
   sc.textContent=sig.conf+"%";
-  const feed=isLivePair()?` · <span style="color:var(--green)">LIVE</span>`:" · DEMO";
-  $("scPair").innerHTML=`${state.pair[0]} (${state.pair[1]}) · ${state.tf} · ${state.risk}${feed}`;
+  const feed=state.live?` · <span style="color:var(--green)">LIVE ${state.feedName}</span>`:` · <span style="color:var(--gold)">DEMO</span>`;
+  $("scPair").innerHTML=`${cur()[0]} · ${state.tf} · ${state.risk}${feed}`;
   renderVerdicts(sig.reasons||[]);
   drawGauge();
 
-  // log a signal only on a fresh candle (once per timeframe) or when not waiting
-  if(sig.dir!=="wait" && (Date.now()-state.lastSignalTf)>TF_MS[state.tf]*0.8){
-    pushSignal(sig); state.lastSignalTf=Date.now();
-  }
+  if(sig.dir!=="wait" && (Date.now()-state.lastSignalTf)>TF_MS[state.tf]*0.8){ pushSignal(sig); state.lastSignalTf=Date.now(); }
 }
 
 /* ---------------- MAIN LOOP ---------------- */
-function startLoop(){
-  state.candles=[state.lastClose];
-  // warm history
-  for(let i=0;i<45;i++){state.candles.push(genCandle());}
+async function startLoop(){
+  state.candles=[]; state.momentum=0; state.regime="range";
+  const ok=await loadLive();
+  if(!ok){ state.lastClose=100; for(let i=0;i<45;i++)state.candles.push(genCandle()); }
   state.running=true;
   $("startBtn").innerHTML="⏹ STOP BOT<small>Engine running</small>";
   $("startBtn").classList.add("running");
   $("stDot").classList.remove("off");
-  $("stTxt").textContent="Connected · Analyzing";
+  $("stTxt").textContent=state.live?"Connected · LIVE":"Offline · Demo";
   $("engineState").textContent="ON";
-  $("srcPill").textContent=isLivePair()?"LIVE":"DEMO";
-  $("srcPill").style.color=isLivePair()?"#16c784":"";
-  renderCtl();
-  // Live crypto refresh every 8s; simulated pairs tick at their timeframe.
-  const interval=isLivePair()?8000:TF_MS[state.tf];
+  $("srcPill").textContent=state.live?state.feedName:"DEMO";
+  $("srcPill").style.color=state.live?"#16c784":"";
+  renderCtl(); renderPairs();
+  // Refresh live candles every 8 seconds.
   const tick=async ()=>{
-    if(isLivePair()){
-      const ok=await loadLive();
-      if(!ok){ state.candles.push(genCandle()); if(state.candles.length>300)state.candles.shift(); }
-    }else{
-      state.candles.push(genCandle());
-      if(state.candles.length>300)state.candles.shift();
-    }
-    tickEngine();drawChart();
+    const ok=await loadLive();
+    if(!ok){ if(state.candles.length)state.candles.push(genCandle()); else { state.lastClose=100; for(let i=0;i<45;i++)state.candles.push(genCandle()); } if(state.candles.length>300)state.candles.shift(); }
+    tickEngine(); drawChart();
   };
-  state.timer=setInterval(tick,interval);
+  state.timer=setInterval(tick,8000);
   tickScanner();
   state.scanTimer=setInterval(tickScanner,2400);
-  // one immediate render (load live data right away if available)
-  tick();
+  tickEngine(); drawChart();
 }
 function stopLoop(){
   state.running=false;
   if(state.timer)clearInterval(state.timer);
   if(state.scanTimer)clearInterval(state.scanTimer);
-  $("startBtn").innerHTML="▶ START BOT<small>Activate signal engine</small>";
+  $("startBtn").innerHTML="▶ START BOT<small>Activate live signal engine</small>";
   $("startBtn").classList.remove("running");
   $("stDot").classList.add("off");
   $("stTxt").textContent="Standby";
   $("engineState").textContent="OFF";
-  $("scDir").textContent="AWAIT";$("scDir").className="sc-big wait";
+  $("srcPill").textContent="—"; $("srcPill").style.color="";
+  $("scDir").textContent="AWAIT"; $("scDir").className="sc-big wait";
   $("scConf").textContent="—";
 }
 
@@ -690,33 +572,28 @@ setInterval(()=>{
 /* ---------------- EVENTS ---------------- */
 $("startBtn").onclick=()=> state.running?stopLoop():startLoop();
 $("pairList").addEventListener("click",e=>{
-  const el=e.target.closest(".pair");if(!el)return;
-  state.pair=PAIRS.find(p=>p[0]===el.dataset.name&&p[1]===el.dataset.market);
-  renderPairs();renderCtl();
+  const el=e.target.closest(".pair"); if(!el)return;
+  state.pairIdx=+el.dataset.idx;
+  renderPairs(); renderCtl();
   if(state.running)startFromSelected();
 });
 $("pairSearch").oninput=renderPairs;
 document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");state.filter=b.dataset.f;renderPairs();
+  b.classList.add("active"); state.filter=b.dataset.f; renderPairs();
 });
-$("tfRow").addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
-  state.tf=b.dataset.tf;renderTF();renderCtl();
-  if(state.running)startFromSelected();
-});
-$("riskRow").addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
-  state.risk=b.dataset.risk;renderRisk();renderCtl();
-});
-function startFromSelected(){stopLoop();startLoop();}
+$("tfRow").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  state.tf=b.dataset.tf; renderTF(); renderCtl(); });
+$("riskRow").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
+  state.risk=b.dataset.risk; renderRisk(); renderCtl(); });
+function startFromSelected(){ stopLoop(); startLoop(); }
 
 window.addEventListener("resize",drawChart);
 
 /* ---------------- INIT ---------------- */
-renderPairs();renderTF();renderRisk();renderCtl();
-drawChart();drawGauge();
-setInterval(()=>{if(state.running)drawChart();},600);
+renderPairs(); renderTF(); renderRisk(); renderCtl();
+drawChart(); drawGauge();
+setInterval(()=>{ if(state.running)drawChart(); },600);
 </script>
 </body>
 </html>
