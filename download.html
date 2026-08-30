@@ -3,38 +3,50 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Download AI Signal Tools</title>
+<title>Download Files — AI Signal Tools</title>
 <style>
-  body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#eaf1ff;text-align:center;
-    background:radial-gradient(600px 400px at 80% -10%,#14223f 0%,#070b14 55%);padding:20px}
-  .card{background:#0d1424;border:1px solid #1c2942;border-radius:16px;padding:28px;max-width:400px;width:100%}
-  .bolt{font-size:38px}
-  h1{font-size:20px;margin:10px 0 4px}
-  p{color:#7f93b8;font-size:14px;line-height:1.5;margin:8px 0 18px}
-  a.btn{display:block;background:linear-gradient(135deg,#8b5cf6,#22d3ee);color:#fff;text-decoration:none;
-    padding:14px;border-radius:12px;font-size:15px;font-weight:800;box-shadow:0 8px 24px rgba(139,92,246,.4);margin-bottom:10px}
-  a.btn.small{background:linear-gradient(135deg,#16c784,#22d3ee);font-size:14px}
-  a.btn.gold{background:linear-gradient(135deg,#f5b83d,#ff8a00);font-size:14px}
-  .hint{margin-top:16px;font-size:11.5px;color:#7f93b8;border-top:1px dashed #1c2942;padding-top:14px;line-height:1.5}
-  .hint a{color:#22d3ee}
+  :root{--bg:#070b14;--panel:#0d1424;--panel2:#111a2e;--line:#1c2942;--txt:#eaf1ff;--mut:#7f93b8;
+    --green:#16c784;--red:#ea3943;--cyan:#22d3ee;--gold:#f5b83d;--violet:#8b5cf6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(600px 400px at 80% -10%,#14223f 0%,var(--bg) 55%);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+  .wrap{max-width:600px;margin:0 auto;padding:24px 16px}
+  h1{text-align:center;font-size:24px;margin-bottom:4px}
+  .sub{text-align:center;color:var(--mut);font-size:13px;margin-bottom:20px}
+  a.btn{display:block;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#fff;text-decoration:none;
+    padding:15px;border-radius:12px;font-size:15px;font-weight:800;box-shadow:0 8px 24px rgba(139,92,246,.3);margin-bottom:10px;text-align:center}
+  a.btn.gold{background:linear-gradient(135deg,#f5b83d,#ff8a00)}
+  a.btn.green{background:linear-gradient(135deg,#16c784,#22d3ee)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+  .card h3{font-size:14px;margin-bottom:6px}
+  .card ol{margin-left:18px;color:var(--mut);font-size:12.5px;line-height:1.7}
+  .card b{color:var(--txt)}
+  .disc{font-size:11px;color:var(--mut);line-height:1.5;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2)}
+  .disc b{color:var(--gold)}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>📥 Download Files</h1>
+  <div class="sub">Tap a button to save the file to your phone or computer.</div>
+
+  <a class="btn green" href="signals.html" download="signals.html">🌐 Signals Web (MT5 + Pocket Option)</a>
+  <a class="btn gold" href="AI_Momentum_Trend.mq5" download="AI_Momentum_Trend.mq5">🤖 MT5 Expert Advisor (.mq5)</a>
+  <a class="btn" href="forex.html" download="forex.html">💹 Forex Page (.html)</a>
+  <a class="btn" href="crypto.html" download="crypto.html">🪙 Crypto Bot (.html)</a>
+
   <div class="card">
-    <div class="bolt">⚡</div>
-    <h1>AI Signal Tools</h1>
-    <p>Download the files. Tap to save, then open the HTML in any browser or drop the .mq5 into your MT5 Experts folder.</p>
-    <a class="btn gold" href="AI_Momentum_Trend.mq5" download="AI_Momentum_Trend.mq5">🤖 Download MT5 EA (.mq5)</a>
-    <a class="btn" href="signals.html" download="signals.html">🌐 Download Signals Web (MT5 + PO)</a>
-    <a class="btn small" href="forex.html" download="forex.html">💹 Download Forex Page (.html)</a>
-    <a class="btn" href="index.html" download="index.html">🪙 Download Live Crypto Bot (.html)</a>
-    <div class="hint">
-      <b>Install the MT5 EA:</b> copy <code>AI_Momentum_Trend.mq5</code> into
-      <code>MetaTrader 5 &gt; MQL5 &gt; Experts</code>, open MT5 → Navigator → refresh →
-      drag the EA onto your chart. AutoTrade is OFF by default (signals only).
-      <br><br><b>Live site:</b> <a href="https://Umerkhan12474746.github.io/my-first-project/">GitHub Pages</a>
-    </div>
+    <h3>🤖 How to install the MT5 Expert Advisor</h3>
+    <ol>
+      <li>Tap <b>MT5 Expert Advisor (.mq5)</b> above to download it.</li>
+      <li>On your computer, copy the file into:<br><b>MetaTrader 5 → MQL5 → Experts</b> folder.</li>
+      <li>Open MT5 → <b>Navigator</b> panel (left side) → right-click → <b>Refresh</b>.</li>
+      <li>Drag the EA onto your forex chart. Turn on <b>Algo Trading</b>.</li>
+      <li>It starts with <b>auto-trade OFF</b> (signals + arrows only) — safer. Turn it ON only after testing on a demo account.</li>
+    </ol>
   </div>
+
+  <div class="disc"><b>⚠️</b> Test on a <b>demo account</b> first. No bot guarantees profits. Not financial advice.</div>
+</div>
 </body>
 </html>
