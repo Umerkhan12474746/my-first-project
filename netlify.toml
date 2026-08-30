@@ -1,0 +1,6 @@
+# Netlify static deploy — serve the plain index.html, no build step.
+[build]
+  publish = "."
+
+# Publish directory contains the Next.js scaffold too; Netlify will serve
+# the root index.html as the site entry. No build command so Next is never run.
