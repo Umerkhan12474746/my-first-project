@@ -1,43 +1,47 @@
-# AI Live Crypto Signal Bot
+# AI Signal Tools — MT5 Forex EA + Browser Signal Pages
 
-A self-contained, **fully live** crypto signal bot that runs 100% in the browser —
-no backend, no build step, no dependencies. One file to deploy.
+Three tools, one repo:
 
-## Live URL (GitHub Pages)
+1. **`AI_Momentum_Trend.mq5`** — a real **MT5 Expert Advisor** (forex). Reads your
+   broker's **live** market data, runs a Momentum/Trend strategy, draws BUY/SELL
+   arrows, alerts, and can auto-trade.
+2. **`forex.html`** — browser/phone forex signal page (real **daily** ECB data).
+3. **`index.html`** — live crypto signal bot (Binance/OKX/Gate real-time).
 
-**https://Umerkhan12474746.github.io/my-first-project/**
+## 🤖 MT5 Expert Advisor (`AI_Momentum_Trend.mq5`)
 
-## What it does
+**Strategy — Momentum / Trend-Following:**
+- EMA fast/slow crossover (default 9/21) → direction.
+- MACD histogram confirmation → momentum is backing the move.
+- RSI filter → avoids buying overbought / selling oversold.
 
-- **Real live crypto prices** pulled from free public exchange APIs in your
-  browser. It tries **Binance** → **OKX** → **Gate.io** in order and picks the
-  first that works, so it stays live even if one exchange is geo-blocked or down.
-- 20 live coins: BTC, ETH, SOL, BNB, ADA, DOGE, LTC, XRP, LINK, AVAX, MATIC,
-  DOT, TRX, TON, SHIB, UNI, ATOM, NEAR, AAVE, ARB.
-- Real-time **candlestick chart** (canvas) with EMA 9 / EMA 21 and Bollinger Bands.
-- Real technical analysis on the live candles: **RSI(14), EMA crossover, MACD,
-  Bollinger breakout, support/resistance, candlestick patterns**.
-- Fires **UP / DOWN / AWAIT** signals with a confidence % and per-strategy verdicts.
-- Pair list shows **real % change** per coin. Data source badge shows the live
-  exchange (Binance/OKX/Gate) — or DEMO only if your device is fully offline.
-- Timeframes 3s–15m, risk level, market-strength gauge, market scanner,
-  recent-signals feed, expiry countdown.
+**Install:**
+1. Copy `AI_Momentum_Trend.mq5` into your MT5 data folder:
+   `MetaTrader 5 > MQL5 > Experts`.
+2. Open MT5 → **Navigator** panel → refresh (right-click → Refresh) → find the EA.
+3. Drag it onto your forex chart, pick a timeframe, **enable Algo Trading**.
+4. Default **AutoTrade = OFF** → it only draws arrows + alerts. Turn it ON only
+   after backtesting and on a demo account.
 
-## Files
-- `index.html` — the entire app (HTML + CSS + JS inline).
-- `download.html` — download `index.html` on a phone.
-- `netlify.toml` — Netlify static deploy config (no build step).
+**Settings you can change** (on the EA's Inputs tab): lot size, SL/TP in pips,
+EMA periods, RSI period & limits, MACD periods, max spread, max trades, alerts.
 
-## Deploy & keep it always live
-**GitHub Pages (auto-updates on every push):** repo → Settings → Pages →
-Source "Deploy from a branch" → branch `arena/01a05460-my-first-project` → `/ (root)`
-→ Save. Each push goes live automatically.
+> ⚠️ Test on a **demo account** first. No strategy is guaranteed.
 
-**Netlify drag & drop:** `app.netlify.com/drop` → upload the folder.
+## 💹 Browser Forex Page (`forex.html`)
+Real **daily** ECB reference rates for ~16 major pairs. Runs the same momentum
+strategy on D1 data and shows a BUY/SELL/WAIT signal + verdicts + chart. Signals
+are **daily-style**, not live intraday — use the MT5 EA for live trading.
+Deployable on GitHub Pages or Netlify (static).
 
-## ⚠️ Honest disclaimer
-Educational signal engine only. It does **not** connect to Pocket Option, place
-trades, or auto-execute anything. Signals are probability-style suggestions from
-technical indicators on real live crypto data. **No signal is guaranteed** — crypto
-& options trading is high risk and you can lose your deposit. Trade at your own
-risk. Not financial advice.
+## 🪙 Live Crypto Bot (`index.html`)
+20 coins, real-time multi-exchange feed (Binance → OKX → Gate.io), full dashboard.
+
+## Live URL
+**https://Umerkhan12474746.github.io/my-first-project/** (GitHub Pages —
+publish branch `arena/01a05460-my-first-project`, root).
+
+## ⚠️ Disclaimer
+Educational tools. They do not connect to your broker to auto-trade unless you
+enable it in the EA, and they never guarantee results. Forex & crypto trading is
+high risk; you can lose money. Not financial advice. Trade at your own risk.

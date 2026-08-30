@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Forex Signal Bot — MT5 Momentum Strategy</title>
+<style>
+  :root{
+    --bg:#070b14; --panel:#0d1424; --panel2:#111a2e; --line:#1c2942;
+    --txt:#eaf1ff; --mut:#7f93b8; --green:#16c784; --red:#ea3943; --cyan:#22d3ee;
+    --gold:#f5b83d; --violet:#8b5cf6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:radial-gradient(1200px 800px at 80% -10%,#14223f 0%,var(--bg) 55%);
+    color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .bolt{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--violet),var(--cyan))}
+  h1{font-size:18px}
+  .logo small{display:block;color:var(--mut);font-size:11px;font-weight:500}
+  .src{padding:7px 12px;border-radius:30px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .panel{background:linear-gradient(180deg,var(--panel),#0b1120);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+  .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  select,input,button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:11px 13px;font-size:14px;font-weight:600}
+  select:focus,input:focus{outline:none;border-color:var(--violet)}
+  .go{background:linear-gradient(135deg,var(--violet),var(--cyan));border:none;cursor:pointer;font-weight:800}
+  .sigcard{text-align:center;padding:8px}
+  .sc-big{font-size:54px;font-weight:900;letter-spacing:1px}
+  .sc-big.buy{color:var(--green);text-shadow:0 0 30px rgba(22,199,132,.5)}
+  .sc-big.sell{color:var(--red);text-shadow:0 0 30px rgba(234,57,67,.5)}
+  .sc-big.wait{color:var(--gold)}
+  .conf{font-size:26px;font-weight:800;margin-top:4px}
+  .conf small{color:var(--mut);font-weight:500;font-size:13px}
+  .sc-lbl{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
+  .strat{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12px;border-bottom:1px dashed var(--line)}
+  .strat:last-child{border-bottom:none}
+  .strat .sval{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+  .sval.ok{background:rgba(22,199,132,.15);color:var(--green)}
+  .sval.mid{background:rgba(245,184,61,.15);color:var(--gold)}
+  .sval.no{background:rgba(234,57,67,.15);color:var(--red)}
+  #chart{width:100%;height:320px;display:block;background:#0a1020;border:1px solid var(--line);border-radius:12px}
+  .price{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);padding:7px 10px;background:var(--panel2);border-radius:9px;margin-top:8px}
+  .price b{color:var(--txt)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+  .sig-log{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+  .sig-item{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px}
+  .sig-item .p{font-weight:700;min-width:70px}
+  .sig-item .dir{font-weight:800;padding:3px 9px;border-radius:6px;font-size:11px}
+  .sig-item .dir.buy{background:rgba(22,199,132,.15);color:var(--green)}
+  .sig-item .dir.sell{background:rgba(234,57,67,.15);color:var(--red)}
+  .sig-item .c{margin-left:auto;font-weight:800}
+  .sig-item .t{color:var(--mut)}
+  .disc{font-size:10.5px;color:var(--mut);line-height:1.5;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2)}
+  .disc b{color:var(--gold)}
+  footer{margin:16px 0 20px;text-align:center;color:var(--mut);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <div class="bolt">⚡</div>
+      <div><h1>Forex Signal Bot</h1><small>Momentum/Trend strategy · EMA + MACD + RSI · real daily data</small></div>
+    </div>
+    <div class="src">Data: <b id="srcPill" style="color:var(--green)">DAILY (ECB)</b></div>
+  </header>
+
+  <div class="panel">
+    <h3>Choose pair &amp; analyze</h3>
+    <div class="row">
+      <select id="pair">
+        <option value="EUR/USD">EUR/USD</option>
+        <option value="GBP/USD">GBP/USD</option>
+        <option value="USD/JPY">USD/JPY</option>
+        <option value="USD/CHF">USD/CHF</option>
+        <option value="USD/CAD">USD/CAD</option>
+        <option value="AUD/USD">AUD/USD</option>
+        <option value="NZD/USD">NZD/USD</option>
+        <option value="EUR/GBP">EUR/GBP</option>
+        <option value="EUR/JPY">EUR/JPY</option>
+        <option value="GBP/JPY">GBP/JPY</option>
+        <option value="AUD/JPY">AUD/JPY</option>
+        <option value="EUR/CHF">EUR/CHF</option>
+        <option value="CAD/JPY">CAD/JPY</option>
+        <option value="CHF/JPY">CHF/JPY</option>
+        <option value="AUD/CAD">AUD/CAD</option>
+        <option value="GBP/CHF">GBP/CHF</option>
+      </select>
+      <button class="go" id="analyze">🔍 Analyze Market</button>
+    </div>
+    <div class="sigcard">
+      <div class="sc-lbl">Signal (Daily)</div>
+      <div class="sc-big wait" id="scDir">—</div>
+      <div class="conf"><span id="scConf">—</span> <small>confidence</small></div>
+      <div class="sc-lbl" style="margin-top:8px" id="scPair">Pick a pair and press Analyze</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Daily chart · EMA 9 / EMA 21</h3>
+      <canvas id="chart"></canvas>
+      <div class="price">
+        <span>Last <b id="pLast">—</b></span>
+        <span>Change 90d <b id="pChg">—</b></span>
+        <span>Bars <b id="pBars">—</b></span>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Strategy verdicts</h3>
+        <div id="scanList" style="font-size:12px;color:var(--mut)">No analysis yet.</div>
+      </div>
+      <div class="panel">
+        <h3>Signal history</h3>
+        <div class="sig-log" id="sigLog"><div style="font-size:12px;color:var(--mut)">No signals yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disc">
+    <b>⚠️ Daily forex data · education only.</b> This page uses <b>real daily (D1)</b> ECB reference rates (free API) for the
+    strategy, so signals are <b>daily-style trend signals, not live intraday</b>. For accurate <b>live</b> MT5 signals, use the
+    included <b>AI_Momentum_Trend.mq5</b> Expert Advisor which reads your broker's real-time data and can auto-trade. This page
+    does not connect to MT5 or place trades. No signal is guaranteed — forex trading is high risk and you can lose money.
+    Not financial advice.
+  </div>
+  <footer>Forex Signal Bot · runs in your browser · companion to the MT5 EA</footer>
+</div>
+
+<script>
+/* Forex pairs mapped to ECB (Frankfurter) base/quote codes */
+const PAIRS = {
+  "EUR/USD":["EUR","USD"],"GBP/USD":["GBP","USD"],"USD/JPY":["USD","JPY"],
+  "USD/CHF":["USD","CHF"],"USD/CAD":["USD","CAD"],"AUD/USD":["AUD","USD"],
+  "NZD/USD":["NZD","USD"],"EUR/GBP":["EUR","GBP"],"EUR/JPY":["EUR","JPY"],
+  "GBP/JPY":["GBP","JPY"],"AUD/JPY":["AUD","JPY"],"EUR/CHF":["EUR","CHF"],
+  "CAD/JPY":["CAD","JPY"],"CHF/JPY":["CHF","JPY"],"AUD/CAD":["AUD","CAD"],
+  "GBP/CHF":["GBP","CHF"]
+};
+
+/* Indicators */
+function ema(arr,p){const k=2/(p+1);const out=[];let prev=arr[0];
+  for(let i=0;i<arr.length;i++){prev=i===0?arr[0]:arr[i]*k+prev*(1-k);out.push(prev);}return out;}
+function rsiArr(closes,p=14){let g=0,l=0;const out=[null];
+  for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];
+    if(i<=p){g+=d>0?d:0;l+=d<0?-d:0;if(i===p){g/=p;l/=p;out.push(100-100/(1+(l===0?1e-9:g/l)));}continue;}
+    g=(g*(p-1)+(d>0?d:0))/p;l=(l*(p-1)+(d<0?-d:0))/p;out.push(100-100/(1+(l===0?1e-9:g/l)));}return out;}
+function macd(closes,f=12,s=26,si=9){const ef=ema(closes,f),es=ema(closes,s);
+  const ml=closes.map((_,i)=>ef[i]-es[i]);const signal=ema(ml,si);
+  const hist=ml.map((v,i)=>v-signal[i]);return{hist};}
+
+/* Fetch ~90 trading days of daily closes from Frankfurter (ECB) */
+async function fetchDaily(base,quote){
+  const end=new Date();
+  const start=new Date(end.getTime()-120*24*3600*1000);
+  const f=d=>d.toISOString().slice(0,10);
+  const url=`https://api.frankfurter.dev/v1/${f(start)}..${f(end)}?from=${base}&to=${quote}`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  const j=await res.json();
+  const rates=j.rates||{};
+  const dates=Object.keys(rates).sort();
+  const closes=dates.map(d=>rates[d][quote]);
+  return {dates,closes};
+}
+
+function analyze(closes){
+  const n=closes.length;
+  const e9=ema(closes,9), e21=ema(closes,21);
+  const R=rsiArr(closes,14);
+  const {hist}=macd(closes);
+  const r=R[n-1], f0=e9[n-1], s0=e21[n-1], f1=e9[n-2], s1=e21[n-2];
+  const h0=hist[n-1], h1=hist[n-2];
+  let score=0, reasons=[];
+
+  const bull=f0>s0, bear=f0<s0;
+  const crossUp=bull&&f1<=s1, crossDn=bear&&f1>=s1;
+
+  if(bull){score+=0.3;reasons.push(["EMA Trend (9/21)","BULLISH","ok"]);}
+  else{score-=0.3;reasons.push(["EMA Trend (9/21)","BEARISH","ok"]);}
+  if(crossUp){score+=0.2;reasons.push(["EMA Crossover","NEW BUY CROSS","ok"]);}
+  if(crossDn){score-=0.2;reasons.push(["EMA Crossover","NEW SELL CROSS","ok"]);}
+
+  const macdBull=h0>0&&h0>h1, macdBear=h0<0&&h0<h1;
+  if(macdBull){score+=0.25;reasons.push(["MACD Momentum","RISING / BULL","ok"]);}
+  else if(macdBear){score-=0.25;reasons.push(["MACD Momentum","FALLING / BEAR","ok"]);}
+  else reasons.push(["MACD Momentum","FLAT","mid"]);
+
+  if(r>70){score-=0.15;reasons.push(["RSI ("+14+")","OVERBOUGHT "+r.toFixed(0),"mid"]);}
+  else if(r<30){score+=0.15;reasons.push(["RSI ("+14+")","OVERSOLD "+r.toFixed(0),"mid"]);}
+  else reasons.push(["RSI ("+14+")","NEUTRAL "+r.toFixed(0),"mid"]);
+
+  score=Math.max(-1,Math.min(1,score));
+  return {score,reasons,r};
+}
+
+function makeSignal(closes){
+  if(closes.length<30) return {dir:"wait",conf:0,reasons:[]};
+  const a=analyze(closes);
+  const abs=Math.abs(a.score);
+  if(abs<0.3) return {dir:"wait",conf:Math.round(50+abs*20),reasons:a.reasons};
+  let conf=55+abs*38;
+  conf=Math.min(92,Math.max(55,conf));
+  return {dir:a.score>0?"buy":"sell",conf:Math.round(conf),reasons:a.reasons};
+}
+
+const $=id=>document.getElementById(id);
+const canvas=$("chart"),ctx=canvas.getContext("2d");
+function drawChart(dates,closes){
+  const w=canvas.clientWidth||600,h=canvas.clientHeight||320;
+  canvas.width=w;canvas.height=h;
+  ctx.clearRect(0,0,w,h);
+  if(closes.length<2){ctx.fillStyle="#3a4a66";ctx.textAlign="center";ctx.fillText("No data",w/2,h/2);return;}
+  const e9=ema(closes,9),e21=ema(closes,21);
+  const n=closes.length;
+  let min=1e9,max=0;for(const v of closes){min=Math.min(min,v);max=Math.max(max,v);}
+  min-=(max-min)*0.05;max+=(max-min)*0.05;
+  const X=i=>w*(i+0.5)/n, Y=v=>h-((v-min)/(max-min))*h;
+  ctx.strokeStyle="#12203a";ctx.fillStyle="#3a4a66";ctx.font="10px sans-serif";
+  for(let g=0;g<5;g++){const yy=Y(min+(max-min)*g/4);ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();ctx.textAlign="left";ctx.fillText((min+(max-min)*g/4).toFixed(4),4,yy-3);}
+  function line(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.beginPath();let st=false;
+    for(let i=0;i<n;i++){if(arr[i]==null)continue;const x=X(i),y=Y(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();}
+  line(closes,"#7f93b8");line(e9,"#16c784");line(e21,"#f5b83d");
+}
+
+const history=[];
+function renderVerdicts(reasons){
+  $("scanList").innerHTML=reasons.map(r=>{
+    const cls=r[2];
+    return `<div class="strat"><span class="sname">📈 ${r[0]}</span><span class="sval ${cls}">${r[1]}</span></div>`;
+  }).join("");
+}
+
+async function run(){
+  const key=$("pair").value;
+  const [base,quote]=PAIRS[key];
+  $("srcPill").textContent="Loading…";
+  $("srcPill").style.color="";
+  try{
+    const {dates,closes}=await fetchDaily(base,quote);
+    drawChart(dates,closes);
+    const sig=makeSignal(closes);
+    const sd=$("scDir");
+    if(sig.dir==="buy"){sd.textContent="BUY";sd.className="sc-big buy";}
+    else if(sig.dir==="sell"){sd.textContent="SELL";sd.className="sc-big sell";}
+    else{sd.textContent="WAIT";sd.className="sc-big wait";}
+    $("scConf").textContent=sig.conf+"%";
+    $("scPair").textContent=key+" · D1 · EMA+MACD+RSI";
+    renderVerdicts(sig.reasons||[]);
+    $("pLast").textContent=closes[closes.length-1].toFixed(5);
+    $("pChg").textContent=((closes[closes.length-1]-closes[0])/closes[0]*100).toFixed(2)+"%";
+    $("pBars").textContent=closes.length;
+    $("srcPill").textContent="DAILY (ECB)";
+    $("srcPill").style.color="#16c784";
+    if(sig.dir!=="wait"){
+      const ts=new Date().toLocaleTimeString("en-GB",{hour12:false});
+      const log=$("sigLog");
+      if(log.children[0]&&log.children[0].textContent.includes("No signals"))log.innerHTML="";
+      log.insertAdjacentHTML("afterbegin",`<div class="sig-item">
+        <span class="p">${key}</span><span class="dir ${sig.dir}">${sig.dir.toUpperCase()}</span>
+        <span class="c" style="color:${sig.dir==='buy'?'var(--green)':'var(--red)'}">${sig.conf}%</span>
+        <span class="t">${ts}</span></div>`);
+      if(log.children.length>20)log.lastChild.remove();
+    }
+  }catch(e){
+    $("srcPill").textContent="ERROR";
+    $("scDir").textContent="ERR";$("scDir").className="sc-big wait";
+    $("scanList").innerHTML=`<div style="color:var(--red)">Could not fetch data (need internet / try again). ${e.message}</div>`;
+  }
+}
+
+$("analyze").onclick=run;
+window.addEventListener("resize",()=>{ /* redraw handled next run */ });
+// auto-run once
+run();
+</script>
+</body>
+</html>
