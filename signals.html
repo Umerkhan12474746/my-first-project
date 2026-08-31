@@ -47,6 +47,12 @@
   .sc-sub{margin-top:8px;font-size:13px;color:var(--mut)}
   .scan-line{margin-top:10px;font-size:12px;color:var(--cyan);animation:blink 1.4s infinite}
   @keyframes blink{50%{opacity:.5}}
+  .actnow{margin-top:12px;background:linear-gradient(135deg,rgba(22,199,132,.15),rgba(34,211,238,.1));border:1px solid var(--green);border-radius:14px;padding:12px}
+  .actnow.expiring{border-color:var(--red);background:linear-gradient(135deg,rgba(234,57,67,.18),rgba(245,184,61,.1))}
+  .an-lbl{font-size:11px;color:var(--mut);letter-spacing:.5px;text-transform:uppercase}
+  .an-timer{font-size:44px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--green);margin:2px 0}
+  .actnow.expiring .an-timer{color:var(--red)}
+  .an-hint{font-size:11px;color:var(--mut)}
   .cd{display:flex;gap:10px;justify-content:center;margin-top:12px}
   .cdbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:64px}
   .cdbox .n{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
@@ -123,6 +129,11 @@
       <div class="conf"><span id="scConf">—</span> <small>confidence</small></div>
       <div class="sc-sub" id="scSub">Choose a market and press Analyze</div>
       <div class="scan-line" id="scanRoot">🔄 Analyzing market…</div>
+      <div class="actnow" id="actnow">
+        <div class="an-lbl">⏱️ Act now — place this signal before time runs out</div>
+        <div class="an-timer"><span id="anMin">00</span>:<span id="anSec">00</span></div>
+        <div class="an-hint" id="anHint">Signal valid for one market bar</div>
+      </div>
       <div class="cd">
         <div class="cdbox"><div class="n" id="cdSec">--</div><div class="u">NEXT SIGNAL</div></div>
         <div class="cdbox"><div class="n" id="cdCnt">--</div><div class="u">CYCLES</div></div>
@@ -416,6 +427,24 @@ function copySignal(sig){
   alert("Signal copied:\n"+text);
 }
 
+/* ---------- ACT-NOW TIMER (valid window for current signal) ---------- */
+const TF_SEC = {"1m":60,"5m":300,"15m":900,"1h":3600,"1D":86400,"1W":604800};
+let validUntil=0, validMs=60000;
+function setValidWindow(){
+  validMs=(TF_SEC[state.tf]||60)*1000;
+  validUntil=Date.now()+validMs;
+}
+function tickActTimer(){
+  if(!validUntil){ $("anMin").textContent="00";$("anSec").textContent="00";return; }
+  let ms=validUntil-Date.now(); if(ms<0)ms=0;
+  $("anMin").textContent=String(Math.floor(ms/60000)).padStart(2,"0");
+  $("anSec").textContent=String(Math.floor((ms%60000)/1000)).padStart(2,"0");
+  const boxEl=document.getElementById("actnow");
+  if(boxEl){ if(ms<=10000){ boxEl.classList.add("expiring"); } else { boxEl.classList.remove("expiring"); } }
+  const hint=$("anHint");
+  hint.textContent=ms<=0?"New signal coming… wait for next":"Place "+(state.mode==="forex"?"BUY/SELL":"UP/DOWN")+" before this runs out";
+}
+
 async function run(){
   $("srcPill").textContent="Loading…";$("srcPill").style.color="";
   renderCtl();
@@ -430,6 +459,7 @@ async function run(){
   const closes=state.candles.map(c=>c.c);
   drawChart(closes);
   const sig=makeSignal(closes);
+  setValidWindow();
   const sd=$("scDir");
   if(sig.dir==="buy"||sig.dir==="up"){sd.textContent=sig.dir.toUpperCase();sd.className="sc-big buy";}
   else if(sig.dir==="sell"||sig.dir==="down"){sd.textContent=sig.dir.toUpperCase();sd.className="sc-big sell";}
@@ -511,6 +541,7 @@ tickScanLine(); setInterval(tickScanLine,900);
 $("tglSound").className="optbtn on";
 $("tglNotify").className="optbtn on";
 if("Notification" in window){ try{Notification.requestPermission();}catch(e){} }
+setValidWindow(); tickActTimer(); setInterval(tickActTimer,250);
 startAutoLoop();
 </script>
 </body>
