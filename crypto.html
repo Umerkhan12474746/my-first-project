@@ -82,6 +82,12 @@
   .sc-lbl{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
   .sc-pair{font-size:15px;font-weight:700;margin-top:6px}
 
+  .actnow{margin-top:12px;background:linear-gradient(135deg,rgba(22,199,132,.15),rgba(34,211,238,.1));border:1px solid var(--green);border-radius:14px;padding:12px}
+  .actnow.expiring{border-color:var(--red);background:linear-gradient(135deg,rgba(234,57,67,.18),rgba(245,184,61,.1))}
+  .an-lbl{font-size:11px;color:var(--mut);letter-spacing:.5px;text-transform:uppercase}
+  .an-time{font-size:40px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--green);margin:2px 0;line-height:1}
+  .actnow.expiring .an-time{color:var(--red)}
+  .an-count{font-size:13px;font-weight:700;color:var(--txt)}
   .cd{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:12px}
   .cdbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:center;min-width:64px}
   .cdbox .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
@@ -195,6 +201,11 @@
           <div class="sc-big wait" id="scDir">AWAIT</div>
           <div class="conf"><span id="scConf">—</span> <small>confidence</small></div>
           <div class="sc-pair" id="scPair">Select a coin</div>
+          <div class="actnow" id="actnow">
+            <div class="an-lbl">📈 Take the trade at</div>
+            <div class="an-time" id="anTime">--:--</div>
+            <div class="an-count">in <span id="anSec">00</span> seconds</div>
+          </div>
           <div class="cd">
             <div class="cdbox"><div class="n" id="cdMin">00</div><div class="u">MIN</div></div>
             <div class="cdbox"><div class="n" id="cdSec">00</div><div class="u">SEC</div></div>
@@ -497,6 +508,21 @@ function pushSignal(sig){ const ts=new Date().toLocaleTimeString("en-GB",{hour12
     <span class="t">${ts}</span></div>`);
   if(log.children.length>30)log.lastChild.remove(); }
 
+/* ---------------- ACT-NOW TIMER (exact trade time, 12h) ---------------- */
+const TF_SECC={"3s":3,"5s":5,"15s":15,"30s":30,"1m":60,"2m":120,"3m":180,"4m":240,"5m":300,"10m":600,"15m":900};
+let targetTime=0;
+function fmt12h(ts){ const d=new Date(ts); let h=d.getHours(),m=d.getMinutes();
+  const ap=h>=12?"PM":"AM"; h=h%12; if(h===0)h=12; return h+":"+String(m).padStart(2,"0")+" "+ap; }
+function setTargetTime(){ targetTime=Date.now()+(TF_SECC[state.tf]||60)*1000; }
+function tickActTimer(){
+  const boxEl=document.getElementById("actnow");
+  if(!targetTime){ if(boxEl)boxEl.classList.remove("expiring"); return; }
+  $("anTime").textContent=fmt12h(targetTime);
+  let ms=targetTime-Date.now(); if(ms<0)ms=0;
+  $("anSec").textContent=Math.ceil(ms/1000);
+  if(boxEl){ if(ms<=10000){ boxEl.classList.add("expiring"); } else { boxEl.classList.remove("expiring"); } }
+}
+
 /* ---------------- SOUND / NOTIFY on direction flip ---------------- */
 let lastDir="";
 function beep(type){
@@ -523,6 +549,7 @@ function notifyFlip(sig){
 function tickEngine(){
   if(!state.running)return;
   const sig=makeSignal();
+  setTargetTime();
   notifyFlip(sig);
   state.strength=sig.dir==="wait"?Math.round(20+Math.abs(sig.conf-50)):sig.conf;
   const c=state.candles[state.candles.length-1];
@@ -622,6 +649,7 @@ setInterval(()=>{ if(state.running)drawChart(); },600);
 // Auto-start so signals appear immediately without pressing the button.
 setTimeout(()=>{ if(!state.running) startLoop(); }, 300);
 try{ if("Notification" in window){ Notification.requestPermission(); } }catch(e){}
+setTargetTime(); setInterval(tickActTimer,250);
 </script>
 </body>
 </html>
