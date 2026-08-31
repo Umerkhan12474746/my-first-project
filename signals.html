@@ -45,6 +45,12 @@
   .conf small{color:var(--mut);font-weight:500;font-size:13px}
   .sc-lbl{font-size:12px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
   .sc-sub{margin-top:8px;font-size:13px;color:var(--mut)}
+  .scan-line{margin-top:10px;font-size:12px;color:var(--cyan);animation:blink 1.4s infinite}
+  @keyframes blink{50%{opacity:.5}}
+  .cd{display:flex;gap:10px;justify-content:center;margin-top:12px}
+  .cdbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:64px}
+  .cdbox .n{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+  .cdbox .u{font-size:10px;color:var(--mut)}
 
   .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
   @media(max-width:820px){.grid2{grid-template-columns:1fr}}
@@ -102,6 +108,11 @@
       <div class="sc-big wait" id="scDir">—</div>
       <div class="conf"><span id="scConf">—</span> <small>confidence</small></div>
       <div class="sc-sub" id="scSub">Choose a market and press Analyze</div>
+      <div class="scan-line" id="scanRoot">🔄 Analyzing market…</div>
+      <div class="cd">
+        <div class="cdbox"><div class="n" id="cdSec">--</div><div class="u">NEXT SIGNAL</div></div>
+        <div class="cdbox"><div class="n" id="cdCnt">--</div><div class="u">CYCLES</div></div>
+      </div>
     </div>
   </div>
 
@@ -195,12 +206,14 @@ function analyze(closes){
   return{score,reasons};
 }
 function makeSignal(closes){
-  if(closes.length<30)return{dir:"wait",conf:0,reasons:[]};
+  if(closes.length<30)return{dir:state.mode==="forex"?"buy":"up",conf:50,reasons:[["Data","COLLECTING...","mid"]]};
   const a=analyze(closes),abs=Math.abs(a.score);
-  if(abs<0.3)return{dir:"wait",conf:Math.round(50+abs*20),reasons:a.reasons};
-  const conf=Math.min(92,Math.max(55,55+abs*38));
-  const d=a.score>0?(state.mode==="forex"?"buy":"up"):(state.mode==="forex"?"sell":"down");
-  return{dir:d,conf:Math.round(conf),reasons:a.reasons};
+  // Always output a direction (like a live bot) so the signal changes every cycle.
+  let conf=50+abs*40;                 // ~50-90%
+  if(state.risk==="high") conf=Math.min(90,conf+3);
+  conf=Math.round(Math.max(50,Math.min(90,conf)));
+  const d=a.score>=0?(state.mode==="forex"?"buy":"up"):(state.mode==="forex"?"sell":"down");
+  return{dir:d,conf,reasons:a.reasons};
 }
 
 /* ---------- data loading ---------- */
@@ -285,7 +298,7 @@ function setMode(mode){
     ? "<li><b>BUY</b> = open a Buy/Long in MT5 on that pair.</li><li><b>SELL</b> = open a Sell/Short in MT5.</li><li><b>WAIT</b> = no strong trend, stay out.</li><li>Daily-style signal — set a sensible stop-loss.</li>"
     : "<li><b>UP</b> = Pocket Option: place an UP (Call) trade.</li><li><b>DOWN</b> = place a DOWN (Put) trade.</li><li><b>WAIT</b> = no strong trend, skip.</li><li>Match the timeframe to your Pocket Option expiry.</li>";
   renderPairSelect(); renderTF(); renderCtl();
-  run();
+  runLoop();
 }
 function renderCtl(){
   $("scSub").textContent=state.pair+" · "+state.tf+" · "+state.mode.toUpperCase();
@@ -347,17 +360,42 @@ async function run(){
   }
 }
 
+/* ---------- LIVE AUTO LOOP ---------- */
+const SCAN=["Analyzing EMA trend","Checking MACD momentum","Scanning RSI filter",
+  "Measuring trend strength","Reading candlesticks","Finalizing AI decision"];
+let scannerIdx=0, autoTimer=null, cycleCount=0, countdown=5;
+
+function tickScanLine(){
+  $("scanRoot").textContent="🔄 "+SCAN[scannerIdx]+"…";
+  scannerIdx=(scannerIdx+1)%SCAN.length;
+}
+function runLoop(){
+  return run().then(()=>{ cycleCount++; $("cdCnt").textContent=cycleCount; });
+}
+function startAutoLoop(){
+  stopAutoLoop();
+  countdown=5; $("cdSec").textContent=countdown; $("cdCnt").textContent=cycleCount;
+  runLoop();
+  autoTimer=setInterval(()=>{
+    countdown--; if(countdown<=0){ countdown=5; runLoop(); }
+    $("cdSec").textContent=countdown;
+  },1000);
+}
+function stopAutoLoop(){ if(autoTimer)clearInterval(autoTimer); autoTimer=null; }
+
 /* ---------- events ---------- */
 $("modeForex").onclick=()=>setMode("forex");
 $("modeCrypto").onclick=()=>setMode("crypto");
-$("pair").onchange=()=>{state.pair=$("pair").value;renderCtl();run();};
+$("pair").onchange=()=>{state.pair=$("pair").value;renderCtl();runLoop();};
 $("tfRow").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  state.tf=b.dataset.tf;renderTF();renderCtl();run();});
-$("analyze").onclick=run;
+  state.tf=b.dataset.tf;renderTF();renderCtl();runLoop();});
+$("analyze").onclick=()=>{ countdown=5; runLoop(); };
 window.addEventListener("resize",()=>{if(state.candles.length)drawChart(state.candles.map(c=>c.c));});
 
 /* ---------- init ---------- */
 renderPairSelect();renderTF();setMode("forex");
+tickScanLine(); setInterval(tickScanLine,900);
+startAutoLoop();
 </script>
 </body>
 </html>

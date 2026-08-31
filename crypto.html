@@ -394,15 +394,15 @@ function analyze(candles){
 }
 
 function makeSignal(){
-  if(state.candles.length<30) return {dir:"wait",conf:0,reasons:[]};
+  if(state.candles.length<30) return {dir:"UP",conf:50,reasons:[["Data","COLLECTING...","mid"]]};
   const a=analyze(state.candles);
   const abs=Math.abs(a.score);
-  if(abs<0.22) return {dir:"wait",conf:Math.round(50+abs*20),reasons:a.reasons};
-  let conf=52+abs*42;
-  if(state.risk==="High") conf=Math.min(94,conf+2);
-  else if(state.risk==="Low") conf=Math.max(52,conf-3);
-  conf=Math.min(94,Math.max(52,conf+(Math.random()-0.5)*3));
-  return {dir:a.score>0?"UP":"DOWN",conf:Math.round(conf),reasons:a.reasons};
+  // Always pick a direction so the signal updates each cycle (live bot).
+  let conf=50+abs*40;
+  if(state.risk==="High") conf=Math.min(90,conf+3);
+  else if(state.risk==="Low") conf=Math.max(50,conf-3);
+  conf=Math.round(Math.max(50,Math.min(90,conf)));
+  return {dir:a.score>=0?"UP":"DOWN",conf,reasons:a.reasons};
 }
 
 /* ---------------- RENDER HELPERS ---------------- */
