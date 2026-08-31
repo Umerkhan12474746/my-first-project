@@ -65,6 +65,15 @@
   .sval.mid{background:rgba(245,184,61,.15);color:var(--gold)}
   .sval.no{background:rgba(234,57,67,.15);color:var(--red)}
 
+  .optbtn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .optbtn.on{border-color:var(--green);color:var(--green)}
+  .optbtn.off{border-color:var(--line);color:var(--mut);opacity:.7}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  @media(max-width:520px){.stats{grid-template-columns:1fr 1fr 1fr}}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .stat .v{font-size:22px;font-weight:800}
+  .stat .l{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v.up{color:var(--green)} .stat .v.down{color:var(--red)} .stat .v.gold{color:var(--gold)}
   .sig-log{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
   .sig-item{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px}
   .sig-item .p{font-weight:700;min-width:70px}
@@ -103,6 +112,11 @@
       <div class="tf" id="tfRow"></div>
       <button class="go" id="analyze">🔍 Analyze</button>
     </div>
+    <div class="row" style="margin-top:-2px">
+      <button class="optbtn" id="tglSound">🔔 Sound: ON</button>
+      <button class="optbtn" id="tglNotify">📲 Notify: ON</button>
+      <button class="optbtn" id="copySignal">📋 Copy signal</button>
+    </div>
     <div class="sigcard">
       <div class="sc-lbl" id="sigLabel">Signal</div>
       <div class="sc-big wait" id="scDir">—</div>
@@ -136,6 +150,18 @@
         <h3>How to trade it manually</h3>
         <div class="howto" id="howto"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Bot stats <span style="color:var(--mut);font-weight:400">(tracked while this tab is open)</span></h3>
+    <div class="stats">
+      <div class="stat"><div class="v" id="stTotal">0</div><div class="l">Signals</div></div>
+      <div class="stat"><div class="v up" id="stUp">0</div><div class="l">UP / BUY</div></div>
+      <div class="stat"><div class="v down" id="stDown">0</div><div class="l">DOWN / SELL</div></div>
+      <div class="stat"><div class="v gold" id="stAvg">0</div><div class="l">Avg confidence</div></div>
+      <div class="stat"><div class="v" id="stBest">—</div><div class="l">Best pair</div></div>
+      <div class="stat"><div class="v gold" id="stFlips">0</div><div class="l">Direction flips</div></div>
     </div>
   </div>
 
@@ -321,6 +347,56 @@ function renderVerdicts(reasons){
   $("scanList").innerHTML=reasons.map(r=>`<div class="strat"><span class="sname">📈 ${r[0]}</span><span class="sval ${r[2]}">${r[1]}</span></div>`).join("");
 }
 
+/* ---------- sound / notification / copy ---------- */
+let soundOn=true, notifyOn=true, lastDir="";
+const stats={total:0,up:0,down:0,sumConf:0,flips:0,byPair:{}};
+function beep(type){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine";
+    const t=ctx.currentTime;
+    if(type==="up"){o.frequency.setValueAtTime(880,t);}
+    else{o.frequency.setValueAtTime(220,t);}
+    g.gain.setValueAtTime(0.15,t);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.start(t); o.stop(t+0.4);
+  }catch(e){}
+}
+function notify(msg){
+  if(!notifyOn) return;
+  try{ if("Notification" in window && Notification.permission==="granted") new Notification(msg); }catch(e){}
+}
+function detectFlip(newDir){
+  if(lastDir && newDir && lastDir!==newDir){
+    stats.flips++;
+    beep(newDir==="up"||newDir==="buy"?"up":"down");
+    notify("AI Signal flipped to "+newDir.toUpperCase()+" on "+state.pair+" ("+state.tf+")");
+    $("stFlips").textContent=stats.flips;
+  }
+  lastDir=newDir;
+}
+function updateStats(dir,conf){
+  stats.total++; stats.sumConf+=conf;
+  if(dir==="up"||dir==="buy")stats.up++; else stats.down++;
+  const key=state.pair; stats.byPair[key]=(stats.byPair[key]||0)+1;
+  $("stTotal").textContent=stats.total;
+  $("stUp").textContent=stats.up;
+  $("stDown").textContent=stats.down;
+  $("stAvg").textContent=Math.round(stats.sumConf/stats.total)+"%";
+  let best=null,bestN=0; for(const k in stats.byPair){ if(stats.byPair[k]>bestN){best=k;bestN=stats.byPair[k];} }
+  $("stBest").textContent=best?best.replace("/USD",""):"—";
+}
+function copySignal(sig){
+  const dir=sig.dir.toUpperCase();
+  const text=state.mode==="forex"
+    ? `AI Signal: ${dir} ${state.pair} (${state.tf}) confidence ${sig.conf}% — place ${dir==='BUY'?'BUY/Long':'SELL/Short'} in MT5`
+    : `AI Signal: ${dir} ${state.pair} (${state.tf}) confidence ${sig.conf}% — place ${dir==='UP'?'UP/Call':'DOWN/Put'} in Pocket Option`;
+  try{ navigator.clipboard.writeText(text); beep("up"); }catch(e){}
+  alert("Signal copied:\n"+text);
+}
+
 async function run(){
   $("srcPill").textContent="Loading…";$("srcPill").style.color="";
   renderCtl();
@@ -348,6 +424,10 @@ async function run(){
   $("pFeed").textContent=state.feed;
   $("srcPill").textContent=state.mode==="forex"?"DAILY (ECB)":"LIVE "+state.feed;
   $("srcPill").style.color="#16c784";
+  // update live stats + flip detection + sound/notify
+  detectFlip(sig.dir);
+  updateStats(sig.dir,sig.conf);
+  $("scConf").textContent=sig.conf+"%";
   if(sig.dir!=="wait"){
     const ts=new Date().toLocaleTimeString("en-GB",{hour12:false});const log=$("sigLog");
     if(log.children[0]&&log.children[0].textContent.includes("No signals"))log.innerHTML="";
@@ -384,6 +464,9 @@ function startAutoLoop(){
 function stopAutoLoop(){ if(autoTimer)clearInterval(autoTimer); autoTimer=null; }
 
 /* ---------- events ---------- */
+$("tglSound").onclick=()=>{ soundOn=!soundOn; const b=$("tglSound"); b.textContent="🔔 Sound: "+(soundOn?"ON":"OFF"); b.className="optbtn "+(soundOn?"on":"off"); if(soundOn)beep("up"); };
+$("tglNotify").onclick=()=>{ notifyOn=!notifyOn; const b=$("tglNotify"); b.textContent="📲 Notify: "+(notifyOn?"ON":"OFF"); b.className="optbtn "+(notifyOn?"on":"off"); if(notifyOn&&!("Notification" in window)){ b.textContent="📲 Notify: N/A"; } else if(notifyOn){ try{Notification.requestPermission();}catch(e){} } };
+$("copySignal").onclick=()=>{ const a=analyze(state.candles.map(c=>c.c)); copySignal(makeSignal(state.candles.map(c=>c.c))); };
 $("modeForex").onclick=()=>setMode("forex");
 $("modeCrypto").onclick=()=>setMode("crypto");
 $("pair").onchange=()=>{state.pair=$("pair").value;renderCtl();runLoop();};
@@ -395,6 +478,9 @@ window.addEventListener("resize",()=>{if(state.candles.length)drawChart(state.ca
 /* ---------- init ---------- */
 renderPairSelect();renderTF();setMode("forex");
 tickScanLine(); setInterval(tickScanLine,900);
+$("tglSound").className="optbtn on";
+$("tglNotify").className="optbtn on";
+if("Notification" in window){ try{Notification.requestPermission();}catch(e){} }
 startAutoLoop();
 </script>
 </body>

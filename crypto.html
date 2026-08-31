@@ -496,10 +496,33 @@ function pushSignal(sig){ const ts=new Date().toLocaleTimeString("en-GB",{hour12
     <span class="t">${ts}</span></div>`);
   if(log.children.length>30)log.lastChild.remove(); }
 
+/* ---------------- SOUND / NOTIFY on direction flip ---------------- */
+let lastDir="";
+function beep(type){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.type="sine";
+    o.frequency.setValueAtTime(type==="UP"?880:220,ctx.currentTime);
+    g.gain.setValueAtTime(0.12,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+    o.start(); o.stop(ctx.currentTime+0.4);
+  }catch(e){}
+}
+function notifyFlip(sig){
+  if(lastDir && sig.dir!=="wait" && lastDir!==sig.dir){
+    beep(sig.dir);
+    try{ if("Notification" in window && Notification.permission==="granted")
+      new Notification("AI Signal → "+sig.dir+" "+cur()[0]+" ("+state.tf+") "+sig.conf+"%"); }catch(e){}
+  }
+  if(sig.dir!=="wait") lastDir=sig.dir;
+}
+
 /* ---------------- ENGINE CORE ---------------- */
 function tickEngine(){
   if(!state.running)return;
   const sig=makeSignal();
+  notifyFlip(sig);
   state.strength=sig.dir==="wait"?Math.round(20+Math.abs(sig.conf-50)):sig.conf;
   const c=state.candles[state.candles.length-1];
   $("priceTag").textContent=c?c.c.toFixed(2):"—";
@@ -597,6 +620,7 @@ drawChart(); drawGauge();
 setInterval(()=>{ if(state.running)drawChart(); },600);
 // Auto-start so signals appear immediately without pressing the button.
 setTimeout(()=>{ if(!state.running) startLoop(); }, 300);
+try{ if("Notification" in window){ Notification.requestPermission(); } }catch(e){}
 </script>
 </body>
 </html>
