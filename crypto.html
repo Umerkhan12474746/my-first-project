@@ -336,10 +336,11 @@ function genCandle(){
 /* ---------------- INDICATORS ---------------- */
 function ema(arr,p){ const k=2/(p+1);const out=[];let prev=arr[0];
   for(let i=0;i<arr.length;i++){prev= i===0?arr[0]:arr[i]*k+prev*(1-k);out.push(prev);} return out; }
-function rsi(closes,p=14){ let g=0,l=0;const out=[null];
+function rsi(closes,p=14){ // returns same length as input; null during warmup
+  const out=new Array(closes.length).fill(null); let g=0,l=0;
   for(let i=1;i<closes.length;i++){ const d=closes[i]-closes[i-1];
-    if(i<=p){ g+=d>0?d:0;l+=d<0?-d:0; if(i===p){g/=p;l/=p;out.push(100-100/(1+(l===0?1e-9:g/l)));} continue; }
-    g=(g*(p-1)+(d>0?d:0))/p; l=(l*(p-1)+(d<0?-d:0))/p; out.push(100-100/(1+(l===0?1e-9:g/l))); }
+    if(i<=p){ g+=d>0?d:0;l+=d<0?-d:0; if(i===p){g/=p;l/=p;out[i]=100-100/(1+(l===0?1e-9:g/l));} continue; }
+    g=(g*(p-1)+(d>0?d:0))/p; l=(l*(p-1)+(d<0?-d:0))/p; out[i]=100-100/(1+(l===0?1e-9:g/l)); }
   return out; }
 function sma(arr,p){ const out=[];for(let i=0;i<arr.length;i++){ if(i<p-1){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=arr[j];out.push(s/p);}return out; }
 function std(arr,p){ const out=[];const m=sma(arr,p);for(let i=0;i<arr.length;i++){ if(m[i]==null){out.push(null);continue;}let s=0;for(let j=i-p+1;j<=i;j++)s+=(arr[j]-m[i])**2;out.push(Math.sqrt(s/p));}return out; }
